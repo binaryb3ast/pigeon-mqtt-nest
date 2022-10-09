@@ -19,14 +19,12 @@ MQTT is a lightweight IoT messaging protocol based on the publish/subscribe mode
 MQTT (Message Queuing Telemetry Transport) is an open source, lightweight messaging protocol, optimized for low latency. This protocol provides a callable and cost-efficient way to connect devices using a publish/subscribe model. A communication system built on MQTT consists of the publishing server, a broker and one or more clients. It is designed for constrained devices and low-bandwidth, high-latency or unreliable networks.
 
 ## Installation
-
+Install From [NPM](https://www.npmjs.com/package/pigeon-mqtt-nest) :
 ```bash
-$ npm install pigeon-mqtt-nestjs
+$ npm i pigeon-mqtt-nest
 ```
  - - - -
 ## Usage
-
-### First Step :
 
 [Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nestjs) will register as a global module.
 You can import with configuration
@@ -45,6 +43,24 @@ You can import with configuration
 })
 export class AppModule {}
 ```
+
+# Events
+
+| Name  | Emitted When |
+| ------------- | ------------- |
+| [Client](#event-client)  | `client` registers itself to `server`  |
+| [Client Ready](#event-clientready)  | `client` has received all its offline messages and be initialized.  |
+| [Client Disconnect](#event-clientdisconnect)  | `client` disconnects.  |
+| [Client Error](#event-clienterror)  | an error occurs.  |
+| [Connection Error](#event-connectionerror)  | an error occurs.  |
+| [Keep Alive Timeout](#event-keepalivetimeout)  | timeout happes in the `client` keepalive.  |
+| [Publish](#event-publish)  | `servers` delivers the `packet` to subscribed `client`.  |
+| [Ack](#event-ack)  | `packet` successfully delivered to the `client`.  |
+| [Subscribe](#event-subscribe)  | `client` successfully subscribe the `subscriptions` in server. |
+| [Unsubscribe](#event-unsubscribe)  | `client` successfully unsubscribe the `subscriptions` in server.  |
+| [Connack Sent](#event-connacksent)  |`server` sends an acknowledge to `client`.  |
+| [Closed](#event-closed)  | `server` is closed.  |
+
 ## Event: client
 
 - `client` [`<Client>`](./Client.md)
