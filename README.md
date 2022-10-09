@@ -10,7 +10,7 @@
 
 ## Description
 
-[Nest](https://github.com/behnamnasehi/nest-mqtt-server) framework TypeScript starter repository.
+ MQTT broker that can run on any stream server, the node way 
 
 ## Installation
 
