@@ -10,7 +10,13 @@
 
 ## Description
 
- MQTT broker that can run on any stream server, the node way 
+ MQTT broker that can run on any stream server, the nest.js way 
+
+## What is MQTT ? 
+
+MQTT is a lightweight IoT messaging protocol based on the publish/subscribe model. It can provide real-time and reliable messaging services for networked devices with very little code and bandwidth. It is widely used in the industries such as the IoT, mobile Internet, smart hardware, Internet of Vehicles and power energy.
+
+MQTT (Message Queuing Telemetry Transport) is an open source, lightweight messaging protocol, optimized for low latency. This protocol provides a callable and cost-efficient way to connect devices using a publish/subscribe model. A communication system built on MQTT consists of the publishing server, a broker and one or more clients. It is designed for constrained devices and low-bandwidth, high-latency or unreliable networks.
 
 ## Installation
 
