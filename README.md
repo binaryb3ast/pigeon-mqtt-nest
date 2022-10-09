@@ -6,11 +6,7 @@
 
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A MQTT Server Side module for Nest.js</p>
-
-## Description
-
- MQTT broker that can run on any stream server, the nest.js way 
+  <p align="center"> MQTT broker that can run on any stream server</p>
 
 ## What is MQTT ? 
 
