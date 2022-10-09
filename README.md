@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="images/logo.jpg" width="1998" height="1000" alt="Nest Mqtt Server Logo" />
+    <img src="images/logo.jpg" width="500" height="250" alt="Nest Mqtt Server Logo" />
 </p>
 
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
