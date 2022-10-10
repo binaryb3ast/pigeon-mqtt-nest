@@ -1,15 +1,18 @@
 {
-  "name": "nest-mqtt-server",
-  "version": "0.0.1",
-  "description": "A MQTT module for server side",
-  "author": "behnammnasehi@gmail.com",
+  "name": "pigeon-mqtt-nest",
+  "version": "0.0.2",
+  "description": "Nest.js MQTT broker that can run on any stream server",
+  "author": "Behnam Nasehi <behnammnasehi@gmail.com>",
   "license": "MIT",
+  "readme": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/blob/main/README.md",
+  "repository": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs",
   "keywords": [
     "mqtt",
     "aedes",
     "nest-mqtt-server",
     "mqtt-server",
-    "nestjs"
+    "nestjs",
+    "nest"
   ],
   "scripts": {
     "prebuild": "rimraf dist",
