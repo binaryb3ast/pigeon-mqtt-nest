@@ -7,6 +7,10 @@
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
 [![npm version](https://badge.fury.io/js/pigeon-mqtt-nest.svg)](https://badge.fury.io/js/pigeon-mqtt-nest)
+[![npm download](https://img.shields.io/npm/dw/pigeon-mqtt-nest)](https://img.shields.io/npm/dw/pigeon-mqtt-nest)
+[![npm lisence](https://img.shields.io/npm/l/pigeon-mqtt-nest)](https://img.shields.io/npm/l/pigeon-mqtt-nest)
+[![github star](https://img.shields.io/github/stars/behnamnasehi/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/stars/behnamnasehi/pigeon-mqtt-nestjs?style=social)
+[![github fork](https://img.shields.io/github/forks/behnamnasehi/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/forks/behnamnasehi/pigeon-mqtt-nestjs?style=social)
 
   <p align="center"> Nest.js MQTT broker that can run on any stream server</p>
 
