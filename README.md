@@ -22,6 +22,8 @@
 - [Handlers](#handlers)
 - [Events](#events)
 - [Methods](#methods)
+- [Packets](#packets)
+- [Middleware & Plugins](#middleware-plugins)
 - [Dependencies](#dependencies)
 - [Stay in touch](#stay-in-touch)
 - [License](#license)
@@ -62,7 +64,12 @@ import with configuration
     PigeonModule.forRoot({
       port: 1884,
       id: "binarybeast",
-    })
+      concurrency:100,
+      queueLimit:42,
+      maxClientsIdLength:23,
+      connectTimeout:30000,
+      heartbeatInterval:60000,
+     })
 
   ],
   controllers: [AppController],
@@ -71,6 +78,17 @@ import with configuration
 export class AppModule {
 }
 ```
+
+- options `<object>`
+  - `mq` [`<MQEmitter>`](#mqemitter) middleware used to deliver messages to subscribed clients. In a cluster environment it is used also to share messages between brokers instances. __Default__: `mqemitter`
+  - `concurrency` `<number>` maximum number of concurrent messages delivered by `mq`. __Default__: `100`
+  - `persistence` [`<Persistence>`](#persistence) middleware that stores _QoS > 0, retained, will_ packets and _subscriptions_. __Default__: `aedes-persistence` (_in memory_)
+  - `queueLimit` `<number>` maximum number of queued messages before client session is established. If number of queued items exceeds, `connectionError` throws an error `Client queue limit reached`. __Default__: `42`
+  - `maxClientsIdLength` option to override MQTT 3.1.0 clients Id length limit. __Default__: `23`
+  - `heartbeatInterval` `<number>` an interval in millisconds at which server beats its health signal in `$SYS/<aedes.id>/heartbeat` topic. __Default__: `60000`
+  - `id` `<string>` aedes broker unique identifier. __Default__: `uuidv4()`
+  - `connectTimeout` `<number>` maximum waiting time in milliseconds waiting for a [`CONNECT`][CONNECT] packet. __Default__: `30000`
+- Returns `<Aedes>`
 
 # Handlers
 
@@ -617,7 +635,8 @@ export class TestService {
 
 | Method  | Emitted When |
 | ------------- | ------------- |
-| [Publish](#method-publish)  | Invoked when server receives a valid [`CONNECT`][CONNECT] packet.  |
+| [Publish](#method-publish)  | Directly deliver `packet` on behalf of server to subscribed clients.  |
+| [Close](#method-close)  | Close aedes server and disconnects all clients.  |
 
 ## Method: Publish
 
@@ -649,10 +668,37 @@ export class TestService {
 }
 ```
 
+## Method: Close
+
+- callback: `<Function>`
+
+Close aedes server and disconnects all clients.
+
+`callback` will be invoked when server is closed.
+
+```typescript
+@Injectable()
+export class TestService {
+
+  //inject Pigeon Service
+  constructor(@Inject(PigeonService) private readonly pigeonService: PigeonService) {
+  }
+
+  @onPublish()
+  async OnPublish(@Topic() topic, @Packet() packet, @Payload() payload, @Client() client) {
+
+    //use this method to publish
+    await this.pigeonService.close();
+
+  }
+
+}
+```
+
 # Packets
 This section describes the format of all packets
 
-| Packet  | Emitted When |
+| Packet  | - |
 | ------------- | ------------- |
 | [Connect](#packet-connect)  | ---  |
 | [Connack](#packet-connack)  | ---  |
@@ -925,6 +971,28 @@ If `password` or `will.payload` are passed as strings, they will automatically b
   }
 }
 ```
+
+# Middleware Plugins
+
+## Persistence
+
+- [aedes-persistence]: In-memory implementation of an Aedes persistence
+- [aedes-persistence-mongodb]: MongoDB persistence for Aedes
+- [aedes-persistence-redis]: Redis persistence for Aedes
+- [aedes-persistence-level]: LevelDB persistence for Aedes
+- [aedes-persistence-nedb]: NeDB persistence for Aedes
+
+## MQEmitter
+
+- [mqemitter]: An opinionated memory Message Queue with an emitter-style API
+- [mqemitter-redis]: Redis-powered mqemitter
+- [mqemitter-mongodb]: Mongodb based mqemitter
+- [mqemitter-child-process]: Share the same mqemitter between a hierarchy of
+  child processes
+- [mqemitter-cs]: Expose a MQEmitter via a simple client/server protocol
+- [mqemitter-p2p]: A P2P implementation of MQEmitter, based on HyperEmitter and
+  a Merkle DAG
+- [mqemitter-aerospike]: Aerospike mqemitter
 
 # Dependencies
 
