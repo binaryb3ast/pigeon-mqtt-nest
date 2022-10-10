@@ -12,16 +12,16 @@
 
 # Topics
 
-- ### [What is MQTT ?](#what-is-mqtt)
-- ### [Installation](#installation)
-- ### [Usage](#usage)
-- ### [Handlers](#handlers)
-- ### [Events](#events)
-- ### [Methods](#methods)
-- ### [Dependencies](#dependencies)
-- ### [Stay in touch](#stay-in-touch)
-- ### [License](#license)
-- ### [Example](src/test.ts)
+- #### [What is MQTT ?](#what-is-mqtt)
+- #### [Installation](#installation)
+- #### [Usage](#usage)
+- #### [Handlers](#handlers)
+- #### [Events](#events)
+- #### [Methods](#methods)
+- #### [Dependencies](#dependencies)
+- #### [Stay in touch](#stay-in-touch)
+- #### [License](#license)
+- #### [Example](src/test.ts)
 
 # What is MQTT ?
 
