@@ -648,6 +648,7 @@ export class TestService {
 
 }
 ```
+
 # Packets
 This section describes the format of all packets
 
@@ -667,8 +668,8 @@ This section describes the format of all packets
 | [Pingreq](#packet-pingreq)  | ---  |
 | [Pingresp](#packet-pingresp)  | ---  |
 | [Disconnect](#packet-disconnect)  | ---  |
- 
-##Packet: Connect
+
+## Packet: Connect
 ```js
 {
   cmd: 'connect',
@@ -712,7 +713,7 @@ This section describes the format of all packets
  
 If `password` or `will.payload` are passed as strings, they will automatically be converted into a `Buffer`.
 
-##Packet: Connack
+## Packet: Connack
 ```js
 {
   cmd: 'connack',
@@ -743,7 +744,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Subscribe
+## Packet: Subscribe
 ```js
 {
   cmd: 'subscribe',
@@ -764,7 +765,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Suback
+## Packet: Suback
 ```js
 {
   cmd: 'suback',
@@ -779,7 +780,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Unsubscribe
+## Packet: Unsubscribe
 ```js
 {
   cmd: 'unsubscribe',
@@ -796,7 +797,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Unsuback
+## Packet: Unsuback
 ```js
 {
   cmd: 'unsuback',
@@ -810,7 +811,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Publish
+## Packet: Publish
 ```js
 {
   cmd: 'publish',
@@ -835,7 +836,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Puback
+## Packet: Puback
 ```js
 {
   cmd: 'puback',
@@ -850,7 +851,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Pubrec
+## Packet: Pubrec
 ```js
 {
   cmd: 'pubrec',
@@ -865,7 +866,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Pubrel
+## Packet: Pubrel
 ```js
 {
   cmd: 'pubrel',
@@ -880,7 +881,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Pubcomp
+## Packet: Pubcomp
 ```js
 {
   cmd: 'pubcomp',
@@ -895,21 +896,21 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 }
 ```
 
-##Packet: Pingreq
+## Packet: Pingreq
 ```js
 {
   cmd: 'pingreq'
 }
 ```
 
-##Packet: Pingresp
+## Packet: Pingresp
 ```js
 {
   cmd: 'pingresp'
 }
 ```
 
-##Packet: Disconnect
+## Packet: Disconnect
 ```js
 {
   cmd: 'disconnect',
