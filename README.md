@@ -648,6 +648,282 @@ export class TestService {
 
 }
 ```
+# Packets
+This section describes the format of all packets
+
+| Packet  | Emitted When |
+| ------------- | ------------- |
+| [Connect](#packet-connect)  | ---  |
+| [Connack](#packet-connack)  | ---  |
+| [Subscribe](#packet-subscribe)  | ---  |
+| [Suback](#packet-suback)  | ---  |
+| [Unsubscribe](#packet-unsubscribe)  | ---  |
+| [Unsuback](#packet-unsuback)  | ---  |
+| [Publish](#packet-publish)  | ---  |
+| [Puback](#packet-puback)  | ---  |
+| [Pubrec](#packet-pubrec)  | ---  |
+| [Pubrel](#packet-pubrel)  | ---  |
+| [Pubcomp](#packet-pubcomp)  | ---  |
+| [Pingreq](#packet-pingreq)  | ---  |
+| [Pingresp](#packet-pingresp)  | ---  |
+| [Disconnect](#packet-disconnect)  | ---  |
+ 
+##Packet: Connect
+```js
+{
+  cmd: 'connect',
+  protocolId: 'MQTT', // Or 'MQIsdp' in MQTT 3.1 and 5.0
+  protocolVersion: 4, // Or 3 in MQTT 3.1, or 5 in MQTT 5.0
+  clean: true, // Can also be false
+  clientId: 'my-device',
+  keepalive: 0, // Seconds which can be any positive number, with 0 as the default setting
+  username: 'matteo',
+  password: Buffer.from('collina'), // Passwords are buffers
+  will: {
+    topic: 'mydevice/status',
+    payload: Buffer.from('dead'), // Payloads are buffers
+    properties: { // MQTT 5.0
+      willDelayInterval: 1234,
+      payloadFormatIndicator: false,
+      messageExpiryInterval: 4321,
+      contentType: 'test',
+      responseTopic: 'topic',
+      correlationData: Buffer.from([1, 2, 3, 4]),
+      userProperties: {
+        'test': 'test'
+      }
+    }
+  },
+  properties: { // MQTT 5.0 properties
+      sessionExpiryInterval: 1234,
+      receiveMaximum: 432,
+      maximumPacketSize: 100,
+      topicAliasMaximum: 456,
+      requestResponseInformation: true,
+      requestProblemInformation: true,
+      userProperties: {
+        'test': 'test'
+      },
+      authenticationMethod: 'test',
+      authenticationData: Buffer.from([1, 2, 3, 4])
+  }
+}
+```
+ 
+If `password` or `will.payload` are passed as strings, they will automatically be converted into a `Buffer`.
+
+##Packet: Connack
+```js
+{
+  cmd: 'connack',
+  returnCode: 0, // Or whatever else you see fit MQTT < 5.0
+  sessionPresent: false, // Can also be true.
+  reasonCode: 0, // reason code MQTT 5.0
+  properties: { // MQTT 5.0 properties
+      sessionExpiryInterval: 1234,
+      receiveMaximum: 432,
+      maximumQoS: 2,
+      retainAvailable: true,
+      maximumPacketSize: 100,
+      assignedClientIdentifier: 'test',
+      topicAliasMaximum: 456,
+      reasonString: 'test',
+      userProperties: {
+        'test': 'test'
+      },
+      wildcardSubscriptionAvailable: true,
+      subscriptionIdentifiersAvailable: true,
+      sharedSubscriptionAvailable: false,
+      serverKeepAlive: 1234,
+      responseInformation: 'test',
+      serverReference: 'test',
+      authenticationMethod: 'test',
+      authenticationData: Buffer.from([1, 2, 3, 4])
+  }
+}
+```
+
+##Packet: Subscribe
+```js
+{
+  cmd: 'subscribe',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    subscriptionIdentifier: 145,
+    userProperties: {
+      test: 'test'
+    }
+  }
+  subscriptions: [{
+    topic: 'test',
+    qos: 0,
+    nl: false, // no Local MQTT 5.0 flag
+    rap: true, // Retain as Published MQTT 5.0 flag
+    rh: 1 // Retain Handling MQTT 5.0
+  }]
+}
+```
+
+##Packet: Suback
+```js
+{
+  cmd: 'suback',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    reasonString: 'test',
+    userProperties: {
+      'test': 'test'
+    }
+  }
+  granted: [0, 1, 2, 128]
+}
+```
+
+##Packet: Unsubscribe
+```js
+{
+  cmd: 'unsubscribe',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    userProperties: {
+      'test': 'test'
+    }
+  }
+  unsubscriptions: [
+    'test',
+    'a/topic'
+  ]
+}
+```
+
+##Packet: Unsuback
+```js
+{
+  cmd: 'unsuback',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    reasonString: 'test',
+    userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+##Packet: Publish
+```js
+{
+  cmd: 'publish',
+          messageId: 42,
+          qos: 2,
+          dup: false,
+          topic: 'test',
+          payload: Buffer.from('test'),
+          retain: false,
+          properties: { // optional properties MQTT 5.0
+    payloadFormatIndicator: true,
+            messageExpiryInterval: 4321,
+            topicAlias: 100,
+            responseTopic: 'topic',
+            correlationData: Buffer.from([1, 2, 3, 4]),
+            userProperties: {
+      'test': 'test'
+    },
+    subscriptionIdentifier: 120, // can be an Array in message from broker, if message included in few another subscriptions
+            contentType: 'test'
+  }
+}
+```
+
+##Packet: Puback
+```js
+{
+  cmd: 'puback',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // MQTT 5.0 properties
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+##Packet: Pubrec
+```js
+{
+  cmd: 'pubrec',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // properties MQTT 5.0
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+##Packet: Pubrel
+```js
+{
+  cmd: 'pubrel',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // properties MQTT 5.0
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+##Packet: Pubcomp
+```js
+{
+  cmd: 'pubcomp',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // properties MQTT 5.0
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+##Packet: Pingreq
+```js
+{
+  cmd: 'pingreq'
+}
+```
+
+##Packet: Pingresp
+```js
+{
+  cmd: 'pingresp'
+}
+```
+
+##Packet: Disconnect
+```js
+{
+  cmd: 'disconnect',
+          reasonCode: 0, // MQTT 5.0 code
+          properties: { // properties MQTT 5.0
+    sessionExpiryInterval: 145,
+            reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    },
+    serverReference: 'test'
+  }
+}
+```
 
 # Dependencies
 
@@ -687,6 +963,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
 
 [GO TO TOP](#topics)
 
