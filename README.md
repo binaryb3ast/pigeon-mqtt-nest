@@ -54,7 +54,7 @@ $ npm i pigeon-mqtt-nest
 
 # Usage
 
-[Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nestjs) will register as a global module. You can
+[Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nest) will register as a global module. You can
 import with configuration
 
 ```typescript
