@@ -1,6 +1,6 @@
 {
   "name": "pigeon-mqtt-nest",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Nest.js MQTT broker that can run on any stream server",
   "author": "Behnam Nasehi <behnammnasehi@gmail.com>",
   "license": "MIT",

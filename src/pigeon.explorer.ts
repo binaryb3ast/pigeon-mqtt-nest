@@ -197,7 +197,6 @@ export class PigeonExplorer implements OnModuleInit {
     for (const parameter of parameters) {
       scatterParameters[parameter.index] = parameter;
     }
-
     try {
       subscriber.handle.bind(subscriber.provider)(
         ...scatterParameters.map(parameter => {
@@ -269,7 +268,8 @@ export class PigeonExplorer implements OnModuleInit {
   getHost() {
     return {
       id: this.broker.id,
-      connectedClients: this.broker.connectedClients
+      connectedClients: this.broker.connectedClients,
+      closed:this.broker.closed
     };
   }
 

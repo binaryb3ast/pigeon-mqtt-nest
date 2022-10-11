@@ -79,6 +79,9 @@ export class TestService {
   @ListenOn("test")
   async behnam(@Topic() topic, @Packet() packet, @Client() client) {
     console.log("Function: @behnam()");
+
+    this.pigeonService.getBrokerInstance().closed;
+
     await this.pigeonService.publish({
       topic: "test2", qos: 0, cmd: "publish", payload: "", dup: false, retain: false
     });

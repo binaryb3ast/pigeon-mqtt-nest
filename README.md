@@ -6,10 +6,30 @@
 
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
+[![npm version](https://badge.fury.io/js/pigeon-mqtt-nest.svg)](https://badge.fury.io/js/pigeon-mqtt-nest)
+[![npm download](https://img.shields.io/npm/dw/pigeon-mqtt-nest)](https://img.shields.io/npm/dw/pigeon-mqtt-nest)
+[![npm lisence](https://img.shields.io/npm/l/pigeon-mqtt-nest)](https://img.shields.io/npm/l/pigeon-mqtt-nest)
+[![github star](https://img.shields.io/github/stars/behnamnasehi/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/stars/behnamnasehi/pigeon-mqtt-nestjs?style=social)
+[![github fork](https://img.shields.io/github/forks/behnamnasehi/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/forks/behnamnasehi/pigeon-mqtt-nestjs?style=social)
+
   <p align="center"> Nest.js MQTT broker that can run on any stream server</p>
 
-[![npm version](https://badge.fury.io/js/pigeon-mqtt-nest.svg)](https://badge.fury.io/js/pigeon-mqtt-nest)
-## What is MQTT ?
+# Topics
+
+- [What is MQTT ?](#what-is-mqtt)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Handlers](#handlers)
+- [Events](#events)
+- [Methods](#methods)
+- [Packets](#packets)
+- [Middleware & Plugins](#middleware-plugins)
+- [Dependencies](#dependencies)
+- [Stay in touch](#stay-in-touch)
+- [License](#license)
+- [Example](src/test.ts)
+
+# What is MQTT ?
 
 MQTT is a lightweight IoT messaging protocol based on the publish/subscribe model. It can provide real-time and reliable
 messaging services for networked devices with very little code and bandwidth. It is widely used in the industries such
@@ -20,7 +40,7 @@ This protocol provides a callable and cost-efficient way to connect devices usin
 communication system built on MQTT consists of the publishing server, a broker and one or more clients. It is designed
 for constrained devices and low-bandwidth, high-latency or unreliable networks.
 
-## Installation
+# Installation
 
 Install From [NPM](https://www.npmjs.com/package/pigeon-mqtt-nest) :
 
@@ -32,7 +52,7 @@ $ npm i pigeon-mqtt-nest
 
  - - - -
 
-## Usage
+# Usage
 
 [Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nestjs) will register as a global module. You can
 import with configuration
@@ -44,7 +64,12 @@ import with configuration
     PigeonModule.forRoot({
       port: 1884,
       id: "binarybeast",
-    })
+      concurrency:100,
+      queueLimit:42,
+      maxClientsIdLength:23,
+      connectTimeout:30000,
+      heartbeatInterval:60000,
+     })
 
   ],
   controllers: [AppController],
@@ -53,6 +78,17 @@ import with configuration
 export class AppModule {
 }
 ```
+
+- options `<object>`
+  - `mq` [`<MQEmitter>`](#mqemitter) middleware used to deliver messages to subscribed clients. In a cluster environment it is used also to share messages between brokers instances. __Default__: `mqemitter`
+  - `concurrency` `<number>` maximum number of concurrent messages delivered by `mq`. __Default__: `100`
+  - `persistence` [`<Persistence>`](#persistence) middleware that stores _QoS > 0, retained, will_ packets and _subscriptions_. __Default__: `aedes-persistence` (_in memory_)
+  - `queueLimit` `<number>` maximum number of queued messages before client session is established. If number of queued items exceeds, `connectionError` throws an error `Client queue limit reached`. __Default__: `42`
+  - `maxClientsIdLength` option to override MQTT 3.1.0 clients Id length limit. __Default__: `23`
+  - `heartbeatInterval` `<number>` an interval in millisconds at which server beats its health signal in `$SYS/<aedes.id>/heartbeat` topic. __Default__: `60000`
+  - `id` `<string>` aedes broker unique identifier. __Default__: `uuidv4()`
+  - `connectTimeout` `<number>` maximum waiting time in milliseconds waiting for a [`CONNECT`][CONNECT] packet. __Default__: `30000`
+- Returns `<Aedes>`
 
 # Handlers
 
@@ -64,7 +100,6 @@ export class AppModule {
 | [authorizeSubscribe](#handler-authorizesubscribe)  | restore subscriptions in non-clean session.,incoming client [`SUBSCRIBE`][SUBSCRIBE]  |
 | [published](#handler-published)  | same as [`Event: publish`](#event-publish), but provides a backpressure functionality.  |
 
- 
 ## Handler: preConnect
 
 - client: [`<Client>`](./Client.md)
@@ -311,6 +346,7 @@ export class TestService {
 | [Unsubscribe](#event-unsubscribe)  | `client` successfully unsubscribe the `subscriptions` in server.  |
 | [Connack Sent](#event-connacksent)  |`server` sends an acknowledge to `client`.  |
 | [Closed](#event-closed)  | `server` is closed.  |
+| [Heartbeat](#event-heartbeat)  | `server` beats its health signal in heartbeat topic |
 
 ## Event: client
 
@@ -596,20 +632,426 @@ export class TestService {
 }
 ```
 
-## Dependencies
+## Event: Heartbeat
+
+`server` beats its health signal in heartbeat topic
+
+```typescript
+@Injectable()
+export class TestService {
+
+  constructor(@Inject(PigeonService) private readonly aedesService: PigeonService) {
+  }
+
+  @onHeartBeat()
+  heartBeat(@Host() host) {
+    console.log(`Function: @OnHeartBeat()`);
+  }
+
+}
+```
+
+# Methods
+
+| Method  | Emitted When |
+| ------------- | ------------- |
+| [Publish](#method-publish)  | Directly deliver `packet` on behalf of server to subscribed clients.  |
+| [Close](#method-close)  | Close aedes server and disconnects all clients.  |
+| [Get Broker Instance](#method-get-broker-instance)  | get broker instance  |
+
+## Method: Publish
+
+- `packet` `<object>` [`PUBLISH`][PUBLISH]
+
+Directly deliver `packet` on behalf of server to subscribed clients.
+Bypass [`authorizePublish`](#handler-authorizepublish-client-packet-callback).
+
+`callback` will be invoked with `error` arugments after finish.
+
+```typescript
+@Injectable()
+export class TestService {
+
+  //inject Pigeon Service
+  constructor(@Inject(PigeonService) private readonly pigeonService: PigeonService) {
+  }
+
+  @onPublish()
+  async OnPublish(@Topic() topic, @Packet() packet, @Payload() payload, @Client() client) {
+
+    //use this method to publish
+    await this.pigeonService.publish({
+      topic: "test2", qos: 0, cmd: "publish", payload: "", dup: false, retain: false
+    });
+
+  }
+
+}
+```
+
+## Method: Close
+
+- callback: `<Function>`
+
+Close aedes server and disconnects all clients.
+
+`callback` will be invoked when server is closed.
+
+```typescript
+@Injectable()
+export class TestService {
+
+  //inject Pigeon Service
+  constructor(@Inject(PigeonService) private readonly pigeonService: PigeonService) {
+  }
+
+  @onPublish()
+  async OnPublish(@Topic() topic, @Packet() packet, @Payload() payload, @Client() client) {
+
+    //use this method to publish
+    await this.pigeonService.close();
+
+  }
+
+}
+```
+
+## Method: Get Broker Instance
+
+get broker instance
+
+```typescript
+@Injectable()
+export class TestService {
+
+  //inject Pigeon Service
+  constructor(@Inject(PigeonService) private readonly pigeonService: PigeonService) {
+  }
+
+  @onPublish()
+  async OnPublish(@Topic() topic, @Packet() packet, @Payload() payload, @Client() client) {
+    
+    await this.pigeonService.getBrokerInstance();
+
+  }
+
+}
+```
+
+# Packets
+This section describes the format of all packets
+
+| Packet  | - |
+| ------------- | ------------- |
+| [Connect](#packet-connect)  | ---  |
+| [Connack](#packet-connack)  | ---  |
+| [Subscribe](#packet-subscribe)  | ---  |
+| [Suback](#packet-suback)  | ---  |
+| [Unsubscribe](#packet-unsubscribe)  | ---  |
+| [Unsuback](#packet-unsuback)  | ---  |
+| [Publish](#packet-publish)  | ---  |
+| [Puback](#packet-puback)  | ---  |
+| [Pubrec](#packet-pubrec)  | ---  |
+| [Pubrel](#packet-pubrel)  | ---  |
+| [Pubcomp](#packet-pubcomp)  | ---  |
+| [Pingreq](#packet-pingreq)  | ---  |
+| [Pingresp](#packet-pingresp)  | ---  |
+| [Disconnect](#packet-disconnect)  | ---  |
+
+## Packet: Connect
+```js
+{
+  cmd: 'connect',
+  protocolId: 'MQTT', // Or 'MQIsdp' in MQTT 3.1 and 5.0
+  protocolVersion: 4, // Or 3 in MQTT 3.1, or 5 in MQTT 5.0
+  clean: true, // Can also be false
+  clientId: 'my-device',
+  keepalive: 0, // Seconds which can be any positive number, with 0 as the default setting
+  username: 'matteo',
+  password: Buffer.from('collina'), // Passwords are buffers
+  will: {
+    topic: 'mydevice/status',
+    payload: Buffer.from('dead'), // Payloads are buffers
+    properties: { // MQTT 5.0
+      willDelayInterval: 1234,
+      payloadFormatIndicator: false,
+      messageExpiryInterval: 4321,
+      contentType: 'test',
+      responseTopic: 'topic',
+      correlationData: Buffer.from([1, 2, 3, 4]),
+      userProperties: {
+        'test': 'test'
+      }
+    }
+  },
+  properties: { // MQTT 5.0 properties
+      sessionExpiryInterval: 1234,
+      receiveMaximum: 432,
+      maximumPacketSize: 100,
+      topicAliasMaximum: 456,
+      requestResponseInformation: true,
+      requestProblemInformation: true,
+      userProperties: {
+        'test': 'test'
+      },
+      authenticationMethod: 'test',
+      authenticationData: Buffer.from([1, 2, 3, 4])
+  }
+}
+```
+ 
+If `password` or `will.payload` are passed as strings, they will automatically be converted into a `Buffer`.
+
+## Packet: Connack
+```js
+{
+  cmd: 'connack',
+  returnCode: 0, // Or whatever else you see fit MQTT < 5.0
+  sessionPresent: false, // Can also be true.
+  reasonCode: 0, // reason code MQTT 5.0
+  properties: { // MQTT 5.0 properties
+      sessionExpiryInterval: 1234,
+      receiveMaximum: 432,
+      maximumQoS: 2,
+      retainAvailable: true,
+      maximumPacketSize: 100,
+      assignedClientIdentifier: 'test',
+      topicAliasMaximum: 456,
+      reasonString: 'test',
+      userProperties: {
+        'test': 'test'
+      },
+      wildcardSubscriptionAvailable: true,
+      subscriptionIdentifiersAvailable: true,
+      sharedSubscriptionAvailable: false,
+      serverKeepAlive: 1234,
+      responseInformation: 'test',
+      serverReference: 'test',
+      authenticationMethod: 'test',
+      authenticationData: Buffer.from([1, 2, 3, 4])
+  }
+}
+```
+
+## Packet: Subscribe
+```js
+{
+  cmd: 'subscribe',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    subscriptionIdentifier: 145,
+    userProperties: {
+      test: 'test'
+    }
+  }
+  subscriptions: [{
+    topic: 'test',
+    qos: 0,
+    nl: false, // no Local MQTT 5.0 flag
+    rap: true, // Retain as Published MQTT 5.0 flag
+    rh: 1 // Retain Handling MQTT 5.0
+  }]
+}
+```
+
+## Packet: Suback
+```js
+{
+  cmd: 'suback',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    reasonString: 'test',
+    userProperties: {
+      'test': 'test'
+    }
+  }
+  granted: [0, 1, 2, 128]
+}
+```
+
+## Packet: Unsubscribe
+```js
+{
+  cmd: 'unsubscribe',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    userProperties: {
+      'test': 'test'
+    }
+  }
+  unsubscriptions: [
+    'test',
+    'a/topic'
+  ]
+}
+```
+
+## Packet: Unsuback
+```js
+{
+  cmd: 'unsuback',
+  messageId: 42,
+  properties: { // MQTT 5.0 properties
+    reasonString: 'test',
+    userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+## Packet: Publish
+```js
+{
+  cmd: 'publish',
+          messageId: 42,
+          qos: 2,
+          dup: false,
+          topic: 'test',
+          payload: Buffer.from('test'),
+          retain: false,
+          properties: { // optional properties MQTT 5.0
+    payloadFormatIndicator: true,
+            messageExpiryInterval: 4321,
+            topicAlias: 100,
+            responseTopic: 'topic',
+            correlationData: Buffer.from([1, 2, 3, 4]),
+            userProperties: {
+      'test': 'test'
+    },
+    subscriptionIdentifier: 120, // can be an Array in message from broker, if message included in few another subscriptions
+            contentType: 'test'
+  }
+}
+```
+
+## Packet: Puback
+```js
+{
+  cmd: 'puback',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // MQTT 5.0 properties
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+## Packet: Pubrec
+```js
+{
+  cmd: 'pubrec',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // properties MQTT 5.0
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+## Packet: Pubrel
+```js
+{
+  cmd: 'pubrel',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // properties MQTT 5.0
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+## Packet: Pubcomp
+```js
+{
+  cmd: 'pubcomp',
+          messageId: 42,
+          reasonCode: 16, // only for MQTT 5.0
+          properties: { // properties MQTT 5.0
+    reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    }
+  }
+}
+```
+
+## Packet: Pingreq
+```js
+{
+  cmd: 'pingreq'
+}
+```
+
+## Packet: Pingresp
+```js
+{
+  cmd: 'pingresp'
+}
+```
+
+## Packet: Disconnect
+```js
+{
+  cmd: 'disconnect',
+          reasonCode: 0, // MQTT 5.0 code
+          properties: { // properties MQTT 5.0
+    sessionExpiryInterval: 145,
+            reasonString: 'test',
+            userProperties: {
+      'test': 'test'
+    },
+    serverReference: 'test'
+  }
+}
+```
+
+# Middleware Plugins
+
+## Persistence
+
+- [aedes-persistence](https://www.npmjs.com/aedes-persistence): In-memory implementation of an Aedes persistence
+- [aedes-persistence-mongodb](https://www.npmjs.com/aedes-persistence-mongodb): MongoDB persistence for Aedes
+- [aedes-persistence-redis](https://www.npmjs.com/aedes-persistence-redis): Redis persistence for Aedes
+- [aedes-persistence-level](https://www.npmjs.com/aedes-persistence-level): LevelDB persistence for Aedes
+- [aedes-persistence-nedb](https://www.npmjs.com/aedes-persistence-nedb): NeDB persistence for Aedes
+
+## MQEmitter
+
+- [mqemitter](https://www.npmjs.com/mqemitter): An opinionated memory Message Queue with an emitter-style API
+- [mqemitter-redis](https://www.npmjs.com/mqemitter-redis): Redis-powered mqemitter
+- [mqemitter-mongodb](https://www.npmjs.com/mqemitter-mongodb): Mongodb based mqemitter
+- [mqemitter-child-process](https://www.npmjs.com/mqemitter-child-process): Share the same mqemitter between a hierarchy of
+  child processes
+- [mqemitter-cs](https://www.npmjs.com/mqemitter-cs): Expose a MQEmitter via a simple client/server protocol
+- [mqemitter-p2p](https://www.npmjs.com/mqemitter-p2p): A P2P implementation of MQEmitter, based on HyperEmitter and
+  a Merkle DAG
+- [mqemitter-aerospike](https://www.npmjs.com/mqemitter-aerospike): Aerospike mqemitter
+
+# Dependencies
 
 * [aedes](https://www.npmjs.com/package/aedes)
 * [aedes-server-factory](https://www.npmjs.com/package/aedes-server-factory)
 
  - - - -
 
-## Stay in touch
+# Stay in touch
 
 - Author Twitter - [@binarybeast](https://twitter.com/binarybeastt)
+- Author Linkedin - [behnamnasehi](https://www.linkedin.com/in/behnamnasehi/)
 
  - - - -
 
-## License
+# License
 
 ```text
 MIT License
@@ -636,37 +1078,5 @@ SOFTWARE.
 ```
 
 
-# Methods
+[GO TO TOP](#topics)
 
-| Method  | Emitted When |
-| ------------- | ------------- |
-| [Publish](#method-publish)  | Invoked when server receives a valid [`CONNECT`][CONNECT] packet.  |
-
-## Method: Publish 
-
-- `packet` `<object>` [`PUBLISH`][PUBLISH]
-
-
-Directly deliver `packet` on behalf of server to subscribed clients. Bypass [`authorizePublish`](#handler-authorizepublish-client-packet-callback).
-
-`callback` will be invoked with `error` arugments after finish.
-
-```typescript
-@Injectable()
-export class TestService {
-
-  //inject Pigeon Service
-  constructor(@Inject(PigeonService) private readonly pigeonService: PigeonService) {}
-  
-  @onPublish()
-  async OnPublish(@Topic() topic, @Packet() packet, @Payload() payload, @Client() client) {
-  
-    //use this method to publish
-    await this.pigeonService.publish({
-      topic: "test2", qos: 0, cmd: "publish", payload: "", dup: false, retain: false
-    });
-  
-  }
-
-}
-```

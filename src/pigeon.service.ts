@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { INSTANCE_BROKER } from "./pigeon.constant";
-import { Aedes} from "aedes";
+import { Aedes } from "aedes";
 import { PubPacket } from "./pigeon.interface";
 
 @Injectable()
@@ -20,5 +20,25 @@ export class PigeonService {
       });
     });
   }
+
+  close(): Promise<string> {
+    return new Promise<any>((resolve) => {
+      this.broker.close(() => {
+        resolve("success");
+      });
+    });
+  }
+
+  getEventsNames(): (string | symbol)[] {
+    return this.broker.eventNames();
+  }
+
+  getBrokerInstance(): Aedes {
+    return this.broker;
+  }
+
+  //todo: subscribe function
+
+  //todo: unsubscribe function
 
 }
