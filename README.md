@@ -54,7 +54,7 @@ $ npm i pigeon-mqtt-nest
 
 # Usage
 
-[Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nestjs) will register as a global module. You can
+[Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nest) will register as a global module. You can
 import with configuration
 
 ```typescript
@@ -346,7 +346,6 @@ export class TestService {
 | [Unsubscribe](#event-unsubscribe)  | `client` successfully unsubscribe the `subscriptions` in server.  |
 | [Connack Sent](#event-connacksent)  |`server` sends an acknowledge to `client`.  |
 | [Closed](#event-closed)  | `server` is closed.  |
-| [Heartbeat](#event-heartbeat)  | `server` beats its health signal in heartbeat topic |
 
 ## Event: client
 
@@ -632,32 +631,12 @@ export class TestService {
 }
 ```
 
-## Event: Heartbeat
-
-`server` beats its health signal in heartbeat topic
-
-```typescript
-@Injectable()
-export class TestService {
-
-  constructor(@Inject(PigeonService) private readonly aedesService: PigeonService) {
-  }
-
-  @onHeartBeat()
-  heartBeat(@Host() host) {
-    console.log(`Function: @OnHeartBeat()`);
-  }
-
-}
-```
-
 # Methods
 
 | Method  | Emitted When |
 | ------------- | ------------- |
 | [Publish](#method-publish)  | Directly deliver `packet` on behalf of server to subscribed clients.  |
 | [Close](#method-close)  | Close aedes server and disconnects all clients.  |
-| [Get Broker Instance](#method-get-broker-instance)  | get broker instance  |
 
 ## Method: Publish
 
@@ -710,28 +689,6 @@ export class TestService {
 
     //use this method to publish
     await this.pigeonService.close();
-
-  }
-
-}
-```
-
-## Method: Get Broker Instance
-
-get broker instance
-
-```typescript
-@Injectable()
-export class TestService {
-
-  //inject Pigeon Service
-  constructor(@Inject(PigeonService) private readonly pigeonService: PigeonService) {
-  }
-
-  @onPublish()
-  async OnPublish(@Topic() topic, @Packet() packet, @Payload() payload, @Client() client) {
-    
-    await this.pigeonService.getBrokerInstance();
 
   }
 
@@ -1019,23 +976,23 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 
 ## Persistence
 
-- [aedes-persistence](https://www.npmjs.com/aedes-persistence): In-memory implementation of an Aedes persistence
-- [aedes-persistence-mongodb](https://www.npmjs.com/aedes-persistence-mongodb): MongoDB persistence for Aedes
-- [aedes-persistence-redis](https://www.npmjs.com/aedes-persistence-redis): Redis persistence for Aedes
-- [aedes-persistence-level](https://www.npmjs.com/aedes-persistence-level): LevelDB persistence for Aedes
-- [aedes-persistence-nedb](https://www.npmjs.com/aedes-persistence-nedb): NeDB persistence for Aedes
+- [aedes-persistence]: In-memory implementation of an Aedes persistence
+- [aedes-persistence-mongodb]: MongoDB persistence for Aedes
+- [aedes-persistence-redis]: Redis persistence for Aedes
+- [aedes-persistence-level]: LevelDB persistence for Aedes
+- [aedes-persistence-nedb]: NeDB persistence for Aedes
 
 ## MQEmitter
 
-- [mqemitter](https://www.npmjs.com/mqemitter): An opinionated memory Message Queue with an emitter-style API
-- [mqemitter-redis](https://www.npmjs.com/mqemitter-redis): Redis-powered mqemitter
-- [mqemitter-mongodb](https://www.npmjs.com/mqemitter-mongodb): Mongodb based mqemitter
-- [mqemitter-child-process](https://www.npmjs.com/mqemitter-child-process): Share the same mqemitter between a hierarchy of
+- [mqemitter]: An opinionated memory Message Queue with an emitter-style API
+- [mqemitter-redis]: Redis-powered mqemitter
+- [mqemitter-mongodb]: Mongodb based mqemitter
+- [mqemitter-child-process]: Share the same mqemitter between a hierarchy of
   child processes
-- [mqemitter-cs](https://www.npmjs.com/mqemitter-cs): Expose a MQEmitter via a simple client/server protocol
-- [mqemitter-p2p](https://www.npmjs.com/mqemitter-p2p): A P2P implementation of MQEmitter, based on HyperEmitter and
+- [mqemitter-cs]: Expose a MQEmitter via a simple client/server protocol
+- [mqemitter-p2p]: A P2P implementation of MQEmitter, based on HyperEmitter and
   a Merkle DAG
-- [mqemitter-aerospike](https://www.npmjs.com/mqemitter-aerospike): Aerospike mqemitter
+- [mqemitter-aerospike]: Aerospike mqemitter
 
 # Dependencies
 
@@ -1047,7 +1004,6 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 # Stay in touch
 
 - Author Twitter - [@binarybeast](https://twitter.com/binarybeastt)
-- Author Linkedin - [behnamnasehi](https://www.linkedin.com/in/behnamnasehi/)
 
  - - - -
 
