@@ -24,7 +24,7 @@ import {
   onKeepLiveTimeout,
   onAck,
   onClosed, onConnackSent, Error, onClientError, onConnectionError
-} from "./index";
+} from "../index";
 @Injectable()
 export class TestService {
 

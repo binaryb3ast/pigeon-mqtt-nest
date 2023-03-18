@@ -1,9 +1,10 @@
 {
   "name": "pigeon-mqtt-nest",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Nest.js MQTT broker that can run on any stream server",
   "author": "Behnam Nasehi <behnammnasehi@gmail.com>",
   "license": "MIT",
+  "main": "index.ts",
   "readme": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/blob/main/README.md",
   "repository": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs",
   "keywords": [
