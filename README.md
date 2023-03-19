@@ -62,7 +62,8 @@ import with configuration
   imports: [
 
     PigeonModule.forRoot({
-      port: 1884,
+      port: 1883, // MQTT TCP Server port
+      portWS: 1884, // MQTT WebSocket Server port
       id: "binarybeast",
       concurrency:100,
       queueLimit:42,

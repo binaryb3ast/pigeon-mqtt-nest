@@ -45,7 +45,8 @@ export interface MqttLoggerOptions {
 }
 
 export interface PigeonModuleOptions extends AedesOptions {
-  port: string;
+  port?: string;
+  portWS: string;
 }
 
 export interface PigeonOptionsFactory {
