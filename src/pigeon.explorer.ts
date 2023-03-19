@@ -7,7 +7,7 @@ import {
   PIGEON_OPTION_PROVIDER,
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
-  SystemTopicsEnum
+  SystemTopicsEnum, LOGGER_KEY
 } from "pigeon.constant";
 import Aedes, {
   Client,
@@ -41,7 +41,7 @@ export class PigeonExplorer implements OnModuleInit {
   }
 
   onModuleInit() {
-    Logger.log(this, "init module");
+    Logger.log("Pigeon Explorer initialized", LOGGER_KEY)
     this.init();
   }
 
@@ -49,6 +49,7 @@ export class PigeonExplorer implements OnModuleInit {
     this.collectProviders();
     const preConnectSubscriber = this.getSubscriber(SystemTopicsEnum.PRE_CONNECT);
     if (preConnectSubscriber) {
+      Logger.log("Listen on <preConnect>", LOGGER_KEY)
       this.broker.preConnect = (client: Client, packet: ConnectPacket, done) => {
         this.processHandlerListener(preConnectSubscriber, client, packet, null, done, null, null, null);
       };
@@ -56,6 +57,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const authenticateSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHENTICATE);
     if (authenticateSubscriber) {
+      Logger.log("Listen on <authenticate>", LOGGER_KEY)
       this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, done) => {
         this.processHandlerListener(authenticateSubscriber, client, null, null, done, username, password, null);
       };
@@ -63,6 +65,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const authorizePublishSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHORIZE_PUBLISH);
     if (authorizePublishSubscriber) {
+      Logger.log("Listen on <authorizePublish>", LOGGER_KEY)
       this.broker.authorizePublish = (client: Client, packet: PublishPacket, done) => {
         this.processHandlerListener(authorizePublishSubscriber, client, packet, null, done, null, null, null);
       };
@@ -70,6 +73,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const authorizeSubscribeSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE);
     if (authorizeSubscribeSubscriber) {
+      Logger.log("Listen on <authorizeSubscribe>", LOGGER_KEY)
       this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, done) => {
         this.processHandlerListener(authorizeSubscribeSubscriber, client, null, subscription, done, null, null, null);
       };
@@ -77,6 +81,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const authorizeForwardSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHORIZE_FORWARD);
     if (authorizeForwardSubscriber) {
+      Logger.log("Listen on <authorizeForward>", LOGGER_KEY)
       this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
         this.processHandlerListener(authorizeForwardSubscriber, client, packet, null, null, null, null, null);
       };
@@ -84,6 +89,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const publishedSubscriber = this.getSubscriber(SystemTopicsEnum.PUBLISHED);
     if (publishedSubscriber) {
+      Logger.log("Listen on <published>", LOGGER_KEY)
       this.broker.published = (packet: PublishPacket, client: Client, cb) => {
         this.processHandlerListener(publishedSubscriber, client, packet, null, cb, null, null, null);
       };
@@ -103,6 +109,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const clientReadySubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT_READY);
     if (clientReadySubscriber) {
+      Logger.log("Listen on <clientReady>", LOGGER_KEY)
       this.broker.on("clientReady", (client: Client) => {
         this.processHandlerListener(clientReadySubscriber, client, null, null, null, null, null, null);
       });
@@ -110,6 +117,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const clientSubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT);
     if (clientSubscriber) {
+      Logger.log("Listen on <client>", LOGGER_KEY)
       this.broker.on("client", (client: Client) => {
         this.processHandlerListener(clientSubscriber, client, null, null, null, null, null, null);
 
@@ -118,6 +126,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const clientDisconnectSubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT_DISCONNECT);
     if (clientDisconnectSubscriber) {
+      Logger.log("Listen on <clientDisconnect>", LOGGER_KEY)
       this.broker.on("clientDisconnect", (client: Client) => {
         this.processHandlerListener(clientDisconnectSubscriber, client, null, null, null, null, null, null);
       });
@@ -125,6 +134,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const clientErrorSubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT_ERROR);
     if (clientErrorSubscriber) {
+      Logger.log("Listen on <clientError>", LOGGER_KEY)
       this.broker.on("clientError", (client: Client, error: Error) => {
         this.processHandlerListener(clientErrorSubscriber, client, null, null, null, null, null, error);
       });
@@ -132,6 +142,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const subscribeSubscriber = this.getSubscriber(SystemTopicsEnum.SUBSCRIBES);
     if (subscribeSubscriber) {
+      Logger.log("Listen on <subscribe>", LOGGER_KEY)
       this.broker.on("subscribe", (subscription: Subscription[], client: Client) => {
         this.processHandlerListener(subscribeSubscriber, client, null, subscription, null, null, null, null);
       });
@@ -139,6 +150,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const unsubscribeSubscriber = this.getSubscriber(SystemTopicsEnum.UNSUBSCRIBES);
     if (unsubscribeSubscriber) {
+      Logger.log("Listen on <unsubscribe>", LOGGER_KEY)
       this.broker.on("unsubscribe", (unsubscription: string[], client: Client) => {
         this.processHandlerListener(unsubscribeSubscriber, client, null, unsubscription, null, null, null, null);
       });
@@ -146,6 +158,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const pingSubscriber = this.getSubscriber(SystemTopicsEnum.PING);
     if (pingSubscriber) {
+      Logger.log("Listen on <ping>", LOGGER_KEY)
       this.broker.on("ping", (packet: PingreqPacket, client: Client) => {
         this.processHandlerListener(pingSubscriber, client, packet, null, null, null, null, null);
       });
@@ -153,6 +166,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const connectionErrorSubscriber = this.getSubscriber(SystemTopicsEnum.CONNECTION_ERROR);
     if (connectionErrorSubscriber) {
+      Logger.log("Listen on <connectionError>", LOGGER_KEY)
       this.broker.on("connectionError", (client: Client,error:Error) => {
         this.processHandlerListener(connectionErrorSubscriber, client, null, null, null, null, null, error);
       });
@@ -160,6 +174,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const keepLiveTimeoutSubscriber = this.getSubscriber(SystemTopicsEnum.KEEP_LIVE_TIMEOUT);
     if (keepLiveTimeoutSubscriber) {
+      Logger.log("Listen on <keepaliveTimeout>", LOGGER_KEY)
       this.broker.on("keepaliveTimeout", (client: Client) => {
         this.processHandlerListener(keepLiveTimeoutSubscriber, client, null, null, null, null, null, null);
 
@@ -168,6 +183,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const ackSubscriber = this.getSubscriber(SystemTopicsEnum.ACK);
     if (ackSubscriber) {
+      Logger.log("Listen on <ack>", LOGGER_KEY)
       this.broker.on("ack", (packet: PublishPacket | PubrelPacket, client: Client) => {
         this.processHandlerListener(ackSubscriber, client, packet, null, null, null, null, null);
 
@@ -176,6 +192,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const closedSubscriber = this.getSubscriber(SystemTopicsEnum.CLOSED);
     if (closedSubscriber) {
+      Logger.log("Listen on <closed>", LOGGER_KEY)
       this.broker.on("closed", () => {
         this.processHandlerListener(closedSubscriber, null, null, null, null, null, null, null);
 
@@ -184,6 +201,7 @@ export class PigeonExplorer implements OnModuleInit {
 
     const connackSentSubscriber = this.getSubscriber(SystemTopicsEnum.CONNACK_SENT);
     if (connackSentSubscriber) {
+      Logger.log("Listen on <connackSent>", LOGGER_KEY)
       this.broker.on("connackSent", (packet: ConnackPacket, client: Client) => {
         this.processHandlerListener(connackSentSubscriber, client, packet, null, null, null, null, null);
       });
@@ -229,6 +247,7 @@ export class PigeonExplorer implements OnModuleInit {
   }
 
   collectProviders() {
+    Logger.log("Collecting Providers...", LOGGER_KEY)
     const providers: InstanceWrapper[] = this.discoveryService.getProviders();
     providers.forEach((wrapper: InstanceWrapper) => {
       const { instance } = wrapper;
@@ -262,6 +281,8 @@ export class PigeonExplorer implements OnModuleInit {
         }
       );
     });
+    Logger.log(`Providers collected : ${this.subscribers.length}`, LOGGER_KEY)
+
   }
 
   getHost() {

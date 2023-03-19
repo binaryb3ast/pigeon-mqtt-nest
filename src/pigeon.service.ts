@@ -4,11 +4,12 @@ import { PubPacket } from "pigeon.interface";
 import Aedes from "aedes";
 
 @Injectable()
-export class PigeonService {
+export class PigeonService{
   constructor(
     @Inject(INSTANCE_BROKER) private readonly broker:Aedes
   ) {
   }
+
 
   publish(packet: PubPacket): Promise<PubPacket> {
     return new Promise<any>((resolve, reject) => {
