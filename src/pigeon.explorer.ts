@@ -8,9 +8,8 @@ import {
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
   SystemTopicsEnum
-} from "./pigeon.constant";
-import {
-  Aedes,
+} from "pigeon.constant";
+import Aedes, {
   Client,
   ConnackPacket,
   ConnectPacket,
@@ -24,7 +23,7 @@ import {
   MqttSubscribeOptions,
   PigeonSubscriber,
   MqttSubscriberParameter
-} from "./pigeon.interface";
+} from "pigeon.interface";
 
 @Injectable()
 export class PigeonExplorer implements OnModuleInit {
@@ -36,7 +35,7 @@ export class PigeonExplorer implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner,
     @Inject(PIGEON_OPTION_PROVIDER) private readonly options: PigeonModuleOptions,
     @Inject(PIGEON_LOGGER_PROVIDER) private readonly logger: Logger,
-    @Inject(INSTANCE_BROKER) private readonly broker: Aedes
+    @Inject(INSTANCE_BROKER) private readonly broker:Aedes
   ) {
     this.subscribers = [];
   }

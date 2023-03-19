@@ -1,10 +1,10 @@
 import { DynamicModule, Global, Module } from "@nestjs/common";
-import { PigeonModuleAsyncOptions, PigeonModuleOptions } from "./pigeon.interface";
-import { PIGEON_OPTION_PROVIDER } from "./pigeon.constant";
-import { createClientProvider } from "./pigeon.provider";
-import { PigeonService } from "./pigeon.service";
-import { createLoggerProvider, createOptionProviders } from "./option.provider";
-import { PigeonExplorer } from "./pigeon.explorer";
+import { PigeonModuleAsyncOptions, PigeonModuleOptions } from "pigeon.interface";
+import { PIGEON_OPTION_PROVIDER } from "pigeon.constant";
+import { createClientProvider } from "pigeon.provider";
+import { PigeonService } from "pigeon.service";
+import { createLoggerProvider, createOptionProviders } from "option.provider";
+import { PigeonExplorer } from "pigeon.explorer";
 import { DiscoveryModule } from "@nestjs/core";
 
 @Global()

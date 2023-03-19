@@ -1,6 +1,6 @@
-import { PigeonModuleAsyncOptions, PigeonModuleOptions, PigeonOptionsFactory } from './pigeon.interface';
+import { PigeonModuleAsyncOptions, PigeonModuleOptions, PigeonOptionsFactory } from "pigeon.interface";
 import { Logger, Provider } from '@nestjs/common';
-import { INSTANCE_BROKER, PIGEON_LOGGER_PROVIDER, PIGEON_OPTION_PROVIDER } from './pigeon.constant';
+import { INSTANCE_BROKER, PIGEON_LOGGER_PROVIDER, PIGEON_OPTION_PROVIDER } from "pigeon.constant";
 
 export function createOptionsProvider(
   options: PigeonModuleAsyncOptions,

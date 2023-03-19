@@ -5,7 +5,6 @@ import { Buffer } from "buffer";
 
 export type MqttMessageTransformer = (payload: Buffer) => any;
 
-export type LoggerConstructor = new (...params) => LoggerService;
 
 export interface MqttSubscribeOptions {
   topic: string | string[];

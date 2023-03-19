@@ -3,12 +3,12 @@ import {
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
   SystemTopicRegexEnum, SystemTopicsEnum
-} from "./pigeon.constant";
+} from "pigeon.constant";
 import {
   MqttMessageTransformer,
   MqttSubscribeOptions,
   MqttSubscriberParameter
-} from "./pigeon.interface";
+} from "pigeon.interface";
 
 export function ListenOn(topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions): CustomDecorator;
 export function ListenOn(topicOrOptions): CustomDecorator {

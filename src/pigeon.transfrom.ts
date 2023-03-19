@@ -1,4 +1,4 @@
-import { MqttMessageTransformer } from './pigeon.interface';
+import { MqttMessageTransformer } from "pigeon.interface";
 
 export const JsonTransform: MqttMessageTransformer = payload => {
   return JSON.parse(payload.toString('utf-8'));
