@@ -7,8 +7,7 @@ import { createServer } from "aedes-server-factory";
 export function createClientProvider(): Provider {
   return {
     provide: INSTANCE_BROKER,
-    useFactory: async (options: PigeonModuleOptions, logger: Logger) => {
-      logger.log("Starting Create Client Provider");
+    useFactory: async (options: PigeonModuleOptions) => {
       Logger.log("Creating Broker Instance");
       let broker: Aedes = createBroker(options);
       await createServer(broker, { ws: true }).listen(options.port);
