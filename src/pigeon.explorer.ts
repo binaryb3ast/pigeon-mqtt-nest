@@ -96,7 +96,6 @@ export class PigeonExplorer implements OnModuleInit {
     }
 
     this.broker.on("publish", (packet: PublishPacket, client: Client) => {
-      console.log(packet.topic);
       const subscriber = this.getSubscriber(packet.topic);
       const publish = this.getSubscriber(SystemTopicsEnum.PUBLISH);
       if (subscriber) {
