@@ -25,7 +25,18 @@ export class CredentialInterface {
 
 export interface MqttSubscriberParameter {
   index: number;
-  type: "error" |"payload" | "topic" | "publish" | "packet" | "client" | "host" | "subscription" | "function" | "credential";
+  type:
+    | 'error'
+    | 'payload'
+    | 'topic'
+    | 'publish'
+    | 'packet'
+    | 'client'
+    | 'host'
+    | 'subscription'
+    | 'subscriptions'
+    | 'function'
+    | 'credential';
   transform?: "json" | "text" | MqttMessageTransformer<unknown>;
 }
 
