@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
 import { DiscoveryService, MetadataScanner, Reflector } from "@nestjs/core";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import {
@@ -21,7 +21,7 @@ import {
 } from "pigeon.interface";
 
 @Injectable()
-export class PigeonExplorer implements OnModuleInit {
+export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   private readonly reflector = new Reflector();
   subscribers: PigeonSubscriber[];
 
@@ -39,6 +39,12 @@ export class PigeonExplorer implements OnModuleInit {
     Logger.log("Pigeon Explorer initialized", LOGGER_KEY)
     this.init();
   }
+
+  async onApplicationShutdown(signal?: string) {
+    Logger.error("Application Shutdown", LOGGER_KEY);
+    await new Promise<void>((resolve) => this.broker.close(() => resolve()));
+  }
+
 
   init() {
     this.collectProviders();
@@ -301,5 +307,6 @@ export class PigeonExplorer implements OnModuleInit {
     }
     return null;
   }
+
 
 }
