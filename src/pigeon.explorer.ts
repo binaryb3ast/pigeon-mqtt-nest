@@ -9,15 +9,10 @@ import {
   KEY_SUBSCRIBER_PARAMS,
   SystemTopicsEnum, LOGGER_KEY
 } from "pigeon.constant";
-import Aedes, {
-  Client,
-  ConnackPacket,
-  ConnectPacket,
-  PingreqPacket,
-  PublishPacket,
-  PubrelPacket,
-  Subscription
-} from "aedes";
+import Aedes from "aedes/types/instance";
+import { Client } from 'aedes';
+import { ConnackPacket, ConnectPacket, PingreqPacket, PublishPacket, PubrelPacket, Subscription } from 'aedes';
+
 import {
   PigeonModuleOptions,
   MqttSubscribeOptions,

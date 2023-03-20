@@ -10,7 +10,12 @@ export function createClientProvider(): Provider {
     useFactory: async (options: PigeonModuleOptions) => {
       Logger.log("Creating Broker Instance",LOGGER_KEY);
       let broker: Aedes = createBroker(options);
-      await createServer(broker, { ws: true }).listen(options.port);
+      if (options.port) {
+        await createServer(broker).listen(options.port);
+      }
+      if (options.portWs) {
+        await createServer(broker, { ws: true }).listen(options.portWs);
+      }
       return broker;
     },
     inject: [PIGEON_OPTION_PROVIDER]
