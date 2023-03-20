@@ -35,6 +35,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@golevelup/nestjs-discovery": "^3.0.0",
     "@nestjs/common": "^9.3.10",
     "@nestjs/core": "^9.3.10",
     "@nestjs/platform-express": "^9.3.10",

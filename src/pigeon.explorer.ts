@@ -1,17 +1,19 @@
 import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
-import { DiscoveryService, MetadataScanner, Reflector } from "@nestjs/core";
+import { MetadataScanner, Reflector } from "@nestjs/core";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
+import { DiscoveredMethodWithMeta, DiscoveryService } from "@golevelup/nestjs-discovery";
 import {
   INSTANCE_BROKER,
   PIGEON_LOGGER_PROVIDER,
   PIGEON_OPTION_PROVIDER,
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
-  SystemTopicsEnum, LOGGER_KEY
+  SystemTopicsEnum, LOGGER_KEY, SystemTopicRegexEnum
 } from "pigeon.constant";
 import Aedes from "aedes/types/instance";
-import { Client } from 'aedes';
-import { ConnackPacket, ConnectPacket, PingreqPacket, PublishPacket, PubrelPacket, Subscription } from 'aedes';
+import { Client } from "aedes";
+import { ConnackPacket, ConnectPacket, PingreqPacket, PublishPacket, PubrelPacket, Subscription } from "aedes";
+import { IPacket } from "mqtt-packet";
 
 import {
   PigeonModuleOptions,
@@ -19,6 +21,25 @@ import {
   PigeonSubscriber,
   MqttSubscriberParameter
 } from "pigeon.interface";
+import { isRegExp } from "util/types";
+import { getTransform } from "pigeon.transfrom";
+
+type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
+  params: MqttSubscriberParameter[];
+};
+
+type HandlerMethodParameters = {
+  client?: Client;
+  packet?: IPacket;
+  subscription?: Subscription;
+  subscriptions?: Subscription[];
+  unsubscription?: string[];
+  callback?: (...args: unknown[]) => unknown;
+  username?: string;
+  password?: Readonly<Buffer>;
+  error?;
+};
+
 
 @Injectable()
 export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
@@ -30,13 +51,13 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     private readonly metadataScanner: MetadataScanner,
     @Inject(PIGEON_OPTION_PROVIDER) private readonly options: PigeonModuleOptions,
     @Inject(PIGEON_LOGGER_PROVIDER) private readonly logger: Logger,
-    @Inject(INSTANCE_BROKER) private readonly broker:Aedes
+    @Inject(INSTANCE_BROKER) private readonly broker: Aedes
   ) {
     this.subscribers = [];
   }
 
   onModuleInit() {
-    Logger.log("Pigeon Explorer initialized", LOGGER_KEY)
+    Logger.log("Pigeon Explorer initialized", LOGGER_KEY);
     this.init();
   }
 
@@ -46,267 +67,275 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   }
 
 
-  init() {
-    this.collectProviders();
-    const preConnectSubscriber = this.getSubscriber(SystemTopicsEnum.PRE_CONNECT);
-    if (preConnectSubscriber) {
-      Logger.log("Listen on <preConnect>", LOGGER_KEY)
-      this.broker.preConnect = (client: Client, packet: ConnectPacket, done) => {
-        this.processHandlerListener(preConnectSubscriber, client, packet, null, done, null, null, null);
+  async init() {
+
+    const providers: Array<DiscoveredMethodWithMetaAndParameters<string>> = (
+      await this.discoveryService.providerMethodsWithMetaAtKey<string>(KEY_SUBSCRIBE_OPTIONS)
+    ).map((p) => ({
+      ...p,
+      params: this.getMethodParameters(p)
+    }));
+
+    const preConnect = this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true);
+    if (preConnect.length > 0) {
+      this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
+        this.processHandlerListener(preConnect, {
+          client,
+          packet,
+          callback
+        });
       };
     }
 
-    const authenticateSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHENTICATE);
-    if (authenticateSubscriber) {
-      Logger.log("Listen on <authenticate>", LOGGER_KEY)
-      this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, done) => {
-        this.processHandlerListener(authenticateSubscriber, client, null, null, done, username, password, null);
+    const clientDisconnect = this.getSubscribers(SystemTopicsEnum.CLIENT_DISCONNECT, providers);
+    if (clientDisconnect.length > 0) {
+      this.broker.on("clientDisconnect", (client: Client) => {
+        this.processHandlerListener(clientDisconnect, { client });
+      });
+    }
+
+    const authenticate = this.getSubscribers(SystemTopicsEnum.AUTHENTICATE, providers, true);
+    if (authenticate.length > 0) {
+      this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, callback) => {
+        this.processHandlerListener(authenticate, {
+          client,
+          callback,
+          username,
+          password
+        });
       };
     }
 
-    const authorizePublishSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHORIZE_PUBLISH);
-    if (authorizePublishSubscriber) {
-      Logger.log("Listen on <authorizePublish>", LOGGER_KEY)
-      this.broker.authorizePublish = (client: Client, packet: PublishPacket, done) => {
-        this.processHandlerListener(authorizePublishSubscriber, client, packet, null, done, null, null, null);
+    const authorizePublish = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true);
+    if (authorizePublish.length > 0) {
+      this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
+        this.processHandlerListener(authorizePublish, {
+          client,
+          packet,
+          callback
+        });
       };
     }
 
-    const authorizeSubscribeSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE);
-    if (authorizeSubscribeSubscriber) {
-      Logger.log("Listen on <authorizeSubscribe>", LOGGER_KEY)
-      this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, done) => {
-        this.processHandlerListener(authorizeSubscribeSubscriber, client, null, subscription, done, null, null, null);
+    const authorizeSubscribe = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers, true);
+    if (authorizeSubscribe.length > 0) {
+      this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
+        this.processHandlerListener(authorizeSubscribe, {
+          client,
+          subscription: subscription,
+          callback
+        });
       };
     }
 
-    const authorizeForwardSubscriber = this.getSubscriber(SystemTopicsEnum.AUTHORIZE_FORWARD);
-    if (authorizeForwardSubscriber) {
-      Logger.log("Listen on <authorizeForward>", LOGGER_KEY)
+    const authorizeForward = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers, true);
+    if (authorizeForward.length > 0) {
       this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
-        this.processHandlerListener(authorizeForwardSubscriber, client, packet, null, null, null, null, null);
+        this.processHandlerListener(authorizeForward, {
+          client,
+          packet
+        });
       };
     }
 
-    const publishedSubscriber = this.getSubscriber(SystemTopicsEnum.PUBLISHED);
-    if (publishedSubscriber) {
-      Logger.log("Listen on <published>", LOGGER_KEY)
-      this.broker.published = (packet: PublishPacket, client: Client, cb) => {
-        this.processHandlerListener(publishedSubscriber, client, packet, null, cb, null, null, null);
+    const published = this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers, true);
+    if (published.length > 0) {
+      this.broker.published = (packet: PublishPacket, client: Client, callback) => {
+        this.processHandlerListener(published, {
+          client,
+          packet,
+          callback
+        });
       };
     }
 
     this.broker.on("publish", (packet: PublishPacket, client: Client) => {
-      const subscriber = this.getSubscriber(packet.topic);
-      const publish = this.getSubscriber(SystemTopicsEnum.PUBLISH);
-      if (subscriber) {
-        this.processHandlerListener(subscriber, client, packet, null, null, null, null, null);
+      let subscriber;
 
-      } else if (publish) {
-        this.processHandlerListener(publish, client, packet, null, null, null, null, null);
+      if (SystemTopicRegexEnum.HEART_BEAT.test(packet.topic)) {
+        subscriber = this.getSubscribers(SystemTopicRegexEnum.HEART_BEAT, providers);
+      } else {
+        subscriber = [
+          ...this.getSubscribers(packet.topic, providers),
+          ...this.getSubscribers(SystemTopicsEnum.PUBLISH, providers)
+        ];
       }
+
+      this.processHandlerListener(subscriber, { client, packet });
     });
 
-    const clientReadySubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT_READY);
-    if (clientReadySubscriber) {
-      Logger.log("Listen on <clientReady>", LOGGER_KEY)
+    const clientReady = this.getSubscribers(SystemTopicsEnum.CLIENT_READY, providers, true);
+    if (clientReady.length > 0) {
       this.broker.on("clientReady", (client: Client) => {
-        this.processHandlerListener(clientReadySubscriber, client, null, null, null, null, null, null);
+        this.processHandlerListener(clientReady, { client });
       });
     }
 
-    const clientSubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT);
-    if (clientSubscriber) {
-      Logger.log("Listen on <client>", LOGGER_KEY)
-      this.broker.on("client", (client: Client) => {
-        this.processHandlerListener(clientSubscriber, client, null, null, null, null, null, null);
-
+    const client = this.getSubscribers(SystemTopicsEnum.CLIENT, providers, true);
+    if (client.length > 0) {
+      this.broker.on("client", (c: Client) => {
+        this.processHandlerListener(client, { client: c });
       });
     }
 
-    const clientDisconnectSubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT_DISCONNECT);
-    if (clientDisconnectSubscriber) {
-      Logger.log("Listen on <clientDisconnect>", LOGGER_KEY)
-      this.broker.on("clientDisconnect", (client: Client) => {
-        this.processHandlerListener(clientDisconnectSubscriber, client, null, null, null, null, null, null);
-      });
-    }
 
-    const clientErrorSubscriber = this.getSubscriber(SystemTopicsEnum.CLIENT_ERROR);
-    if (clientErrorSubscriber) {
-      Logger.log("Listen on <clientError>", LOGGER_KEY)
+    const clientError = this.getSubscribers(SystemTopicsEnum.CLIENT_ERROR, providers, true);
+    if (clientError.length > 0) {
       this.broker.on("clientError", (client: Client, error: Error) => {
-        this.processHandlerListener(clientErrorSubscriber, client, null, null, null, null, null, error);
+        this.processHandlerListener(clientError, { client, error });
       });
     }
 
-    const subscribeSubscriber = this.getSubscriber(SystemTopicsEnum.SUBSCRIBES);
-    if (subscribeSubscriber) {
-      Logger.log("Listen on <subscribe>", LOGGER_KEY)
-      this.broker.on("subscribe", (subscription: Subscription[], client: Client) => {
-        this.processHandlerListener(subscribeSubscriber, client, null, subscription, null, null, null, null);
+    const subscribe = this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers, true);
+    if (subscribe.length > 0) {
+      this.broker.on("subscribe", (subscriptions: Subscription[], client: Client) => {
+        this.processHandlerListener(subscribe, {
+          client,
+          subscriptions
+        });
       });
     }
 
-    const unsubscribeSubscriber = this.getSubscriber(SystemTopicsEnum.UNSUBSCRIBES);
-    if (unsubscribeSubscriber) {
-      Logger.log("Listen on <unsubscribe>", LOGGER_KEY)
+    const unsubscribe = this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers, true);
+    if (unsubscribe.length > 0) {
       this.broker.on("unsubscribe", (unsubscription: string[], client: Client) => {
-        this.processHandlerListener(unsubscribeSubscriber, client, null, unsubscription, null, null, null, null);
+        this.processHandlerListener(unsubscribe, {
+          client,
+          unsubscription
+        });
       });
     }
 
-    const pingSubscriber = this.getSubscriber(SystemTopicsEnum.PING);
-    if (pingSubscriber) {
-      Logger.log("Listen on <ping>", LOGGER_KEY)
+    const ping = this.getSubscribers(SystemTopicsEnum.PING, providers, true);
+    if (ping.length > 0) {
       this.broker.on("ping", (packet: PingreqPacket, client: Client) => {
-        this.processHandlerListener(pingSubscriber, client, packet, null, null, null, null, null);
+        this.processHandlerListener(ping, { client, packet });
       });
     }
 
-    const connectionErrorSubscriber = this.getSubscriber(SystemTopicsEnum.CONNECTION_ERROR);
-    if (connectionErrorSubscriber) {
-      Logger.log("Listen on <connectionError>", LOGGER_KEY)
-      this.broker.on("connectionError", (client: Client,error:Error) => {
-        this.processHandlerListener(connectionErrorSubscriber, client, null, null, null, null, null, error);
+    const connectionError = this.getSubscribers(SystemTopicsEnum.CONNECTION_ERROR, providers, true);
+    if (connectionError.length > 0) {
+      this.broker.on("connectionError", (client: Client, error: Error) => {
+        this.processHandlerListener(connectionError, { client, error });
       });
     }
 
-    const keepLiveTimeoutSubscriber = this.getSubscriber(SystemTopicsEnum.KEEP_LIVE_TIMEOUT);
-    if (keepLiveTimeoutSubscriber) {
-      Logger.log("Listen on <keepaliveTimeout>", LOGGER_KEY)
+    const keepaliveTimeout = this.getSubscribers(SystemTopicsEnum.KEEP_LIVE_TIMEOUT, providers, true);
+    if (keepaliveTimeout.length > 0) {
       this.broker.on("keepaliveTimeout", (client: Client) => {
-        this.processHandlerListener(keepLiveTimeoutSubscriber, client, null, null, null, null, null, null);
-
+        this.processHandlerListener(keepaliveTimeout, { client });
       });
     }
 
-    const ackSubscriber = this.getSubscriber(SystemTopicsEnum.ACK);
-    if (ackSubscriber) {
-      Logger.log("Listen on <ack>", LOGGER_KEY)
+    const ack = this.getSubscribers(SystemTopicsEnum.ACK, providers, true);
+    if (ack.length > 0) {
       this.broker.on("ack", (packet: PublishPacket | PubrelPacket, client: Client) => {
-        this.processHandlerListener(ackSubscriber, client, packet, null, null, null, null, null);
-
+        this.processHandlerListener(ack, { client, packet });
       });
     }
 
-    const closedSubscriber = this.getSubscriber(SystemTopicsEnum.CLOSED);
-    if (closedSubscriber) {
-      Logger.log("Listen on <closed>", LOGGER_KEY)
+    const closed = this.getSubscribers(SystemTopicsEnum.CLOSED, providers, true);
+    if (closed.length > 0) {
       this.broker.on("closed", () => {
-        this.processHandlerListener(closedSubscriber, null, null, null, null, null, null, null);
-
+        this.processHandlerListener(closed);
       });
     }
 
-    const connackSentSubscriber = this.getSubscriber(SystemTopicsEnum.CONNACK_SENT);
-    if (connackSentSubscriber) {
-      Logger.log("Listen on <connackSent>", LOGGER_KEY)
+    const connackSent = this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers, true);
+    if (connackSent.length > 0) {
       this.broker.on("connackSent", (packet: ConnackPacket, client: Client) => {
-        this.processHandlerListener(connackSentSubscriber, client, packet, null, null, null, null, null);
+        this.processHandlerListener(connackSent, { client, packet });
       });
     }
-  }
 
-  processHandlerListener(subscriber, client, packet, subscription, callback, username, password, error) {
-    const parameters = subscriber.parameters || [];
-    const scatterParameters: MqttSubscriberParameter[] = [];
-    for (const parameter of parameters) {
-      scatterParameters[parameter.index] = parameter;
-    }
-    try {
-      subscriber.handle.bind(subscriber.provider)(
-        ...scatterParameters.map(parameter => {
-          switch (parameter?.type) {
-            case "client":
-              return client;
-            case "host":
-              return this.getHost();
-            case "credential":
-              return {
-                username,
-                password
-              };
-            case "function":
-              return callback;
-            case "subscription":
-              return subscription;
-            case "payload":
-              return packet.payload ? packet.payload : null;
-            case "error":
-              return error;
-            case "packet":
-              return packet;
-            default:
-              return null;
-          }
-        }));
-    } catch (err) {
-      this.logger.error(err);
-    }
-  }
-
-  collectProviders() {
-    Logger.log("Collecting Providers...", LOGGER_KEY)
-    const providers: InstanceWrapper[] = this.discoveryService.getProviders();
-    providers.forEach((wrapper: InstanceWrapper) => {
-      const { instance } = wrapper;
-      if (!instance) {
-        return;
-      }
-      this.metadataScanner.scanFromPrototype(
-        instance,
-        Object.getPrototypeOf(instance),
-        key => {
-          const subscribeOptions: MqttSubscribeOptions = this.reflector.get(
-            KEY_SUBSCRIBE_OPTIONS,
-            instance[key]
-          );
-          const parameters = this.reflector.get(
-            KEY_SUBSCRIBER_PARAMS,
-            instance[key]
-          );
-          if (subscribeOptions) {
-            (Array.isArray(subscribeOptions.topic) ? subscribeOptions.topic : [subscribeOptions])
-              .forEach(topic => {
-                this.subscribers.push({
-                  topic: topic.topic ? topic.topic : topic,
-                  parameters: parameters,
-                  handle: instance[key],
-                  provider: instance,
-                  options: subscribeOptions
-                });
-              });
-          }
-        }
+    for (const provider of providers) {
+      this.logger.log(
+        `Mapped {${provider.discoveredMethod.parentClass.name}::${
+          provider.discoveredMethod.methodName
+        }, ${provider.params.map((p) => `${p.type}`).join(", ")}} mqtt subscribtion`
       );
-    });
-    Logger.log(`Providers collected : ${this.subscribers.length}`, LOGGER_KEY)
+    }
+  }
 
+  processHandlerListener(
+    subscribers: DiscoveredMethodWithMetaAndParameters<string>[],
+    params?: HandlerMethodParameters
+  ) {
+    for (const subscriber of subscribers) {
+      try {
+        subscriber.discoveredMethod.handler.bind(subscriber.discoveredMethod.parentClass.instance)(
+          ...this.getHandlerMethodParameters(subscriber.params, params)
+        );
+      } catch (err) {
+        this.logger.error(err);
+      }
+    }
+  }
+
+  private getMethodParameters(subscriber: DiscoveredMethodWithMeta<string>): MqttSubscriberParameter[] {
+    const parameters = this.reflector.get<MqttSubscriberParameter[]>(
+      KEY_SUBSCRIBER_PARAMS,
+      subscriber.discoveredMethod.handler
+    );
+
+    const orderedParameters: MqttSubscriberParameter[] = [];
+    for (const parameter of parameters) {
+      orderedParameters[parameter.index] = parameter;
+    }
+    return orderedParameters;
+  }
+
+  private getSubscribers(
+    metaKey: string | RegExp,
+    providers: DiscoveredMethodWithMetaAndParameters<string>[],
+    single = false
+  ): DiscoveredMethodWithMetaAndParameters<string>[] {
+    const subscribers = providers.filter((p) => {
+      return (isRegExp(metaKey) && metaKey.test(p.meta)) || p.meta === metaKey;
+    });
+    if (single && subscribers.length > 0) {
+      return [subscribers[0]];
+    }
+    return subscribers;
+  }
+
+
+  private getHandlerMethodParameters(parameters: MqttSubscriberParameter[], params?: HandlerMethodParameters) {
+    return parameters.map((parameter) => {
+      switch (parameter?.type) {
+        case "client":
+          return params?.client;
+        case "host":
+          return this.getHost();
+        case "credential":
+          return {
+            username: params?.username,
+            password: params?.password
+          };
+        case "function":
+          return params?.callback;
+        case "subscription":
+          return params?.subscription;
+        case "subscriptions":
+          return params?.subscriptions;
+        case "payload":
+          return getTransform(parameter.transform)((params?.packet as PublishPacket).payload);
+        case "error":
+          return params?.error;
+        case "packet":
+          return params?.packet;
+        default:
+          return null;
+      }
+    });
   }
 
   getHost() {
     return {
       id: this.broker.id,
       connectedClients: this.broker.connectedClients,
-      closed:this.broker.closed
+      closed: this.broker.closed
     };
   }
-
-  private getSubscriber(topic: string): PigeonSubscriber | null {
-    for (const subscriber of this.subscribers) {
-      if (typeof subscriber.topic == "string") {
-        if (subscriber.topic === topic) {
-          return subscriber;
-        }
-      } else if (typeof subscriber.topic == "object") {
-        if (subscriber.topic.test(topic)) {
-          return subscriber;
-        }
-      }
-    }
-    return null;
-  }
-
 
 }

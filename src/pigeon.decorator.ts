@@ -129,14 +129,14 @@ export function Topic() {
  * @param transform
  * @constructor
  */
-export function Payload(transform?: "json" | "text" | MqttMessageTransformer) {
+export function Payload(transform?: "json" | "text" | MqttMessageTransformer<unknown>) {
   return SetParameter({
     type: "payload",
     transform
   });
 }
 
-export function Client(transform?: "json" | "text" | MqttMessageTransformer) {
+export function Client(transform?: "json" | "text" | MqttMessageTransformer<unknown>) {
   return SetParameter({
     type: "client",
     transform

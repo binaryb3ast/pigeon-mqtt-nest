@@ -51,6 +51,7 @@ export interface PigeonOptionsFactory {
   createPigeonConnectOptions(): Promise<PigeonModuleOptions> | PigeonModuleOptions;
 }
 
+
 export interface PigeonModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
   inject?: any[];
   useExisting?: Type<PigeonOptionsFactory>;
