@@ -1,16 +1,14 @@
 import { AedesOptions, PublishPacket } from "aedes";
 import { LoggerService, Type } from "@nestjs/common";
 import { ModuleMetadata } from "@nestjs/common/interfaces";
-import { Buffer } from "buffer";
 
-export type MqttMessageTransformer = (payload: Buffer) => any;
-
+export type MqttMessageTransformer<T> = (payload: string | Buffer) => T;
 
 export interface MqttSubscribeOptions {
   topic: string | string[];
   queue?: boolean;
   share?: string;
-  transform?: "json" | "text" | MqttMessageTransformer;
+  transform?: "json" | "text" | MqttMessageTransformer<unknown>;
 }
 
 export interface PubPacket extends PublishPacket {
@@ -28,7 +26,7 @@ export class CredentialInterface {
 export interface MqttSubscriberParameter {
   index: number;
   type: "error" |"payload" | "topic" | "publish" | "packet" | "client" | "host" | "subscription" | "function" | "credential";
-  transform?: "json" | "text" | MqttMessageTransformer;
+  transform?: "json" | "text" | MqttMessageTransformer<unknown>;
 }
 
 export interface PigeonSubscriber {
@@ -53,13 +51,10 @@ export interface PigeonOptionsFactory {
   createPigeonConnectOptions(): Promise<PigeonModuleOptions> | PigeonModuleOptions;
 }
 
-export interface PigeonModuleAsyncOptions
-  extends Pick<ModuleMetadata, "imports"> {
+export interface PigeonModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
   inject?: any[];
   useExisting?: Type<PigeonOptionsFactory>;
   useClass?: Type<PigeonOptionsFactory>;
-  useFactory?: (
-    ...args: any[]
-  ) => Promise<PigeonModuleOptions> | PigeonModuleOptions;
+  useFactory?: (...args: any[]) => Promise<PigeonOptionsFactory> | PigeonOptionsFactory;
   logger?: MqttLoggerOptions;
 }

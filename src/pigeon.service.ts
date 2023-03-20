@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { INSTANCE_BROKER } from "pigeon.constant";
 import { PubPacket } from "pigeon.interface";
-import Aedes from "aedes";
+import Aedes from "aedes/types/instance";
 
 @Injectable()
 export class PigeonService{
@@ -28,10 +28,6 @@ export class PigeonService{
         resolve("success");
       });
     });
-  }
-
-  getEventsNames(): (string | symbol)[] {
-    return this.broker.eventNames();
   }
 
   getBrokerInstance(): Aedes {
