@@ -5,20 +5,31 @@ import { PigeonModuleOptions } from "pigeon.interface";
 import { INSTANCE_BROKER, LOGGER_KEY, PIGEON_OPTION_PROVIDER } from "pigeon.constant";
 import { createServer } from "aedes-server-factory";
 
+// Define a provider function that creates a broker instance
 export function createClientProvider(): Provider {
   return {
     provide: INSTANCE_BROKER,
     useFactory: async (options: PigeonModuleOptions) => {
+      // Log that a broker instance is being created
       Logger.log("Creating Broker Instance", LOGGER_KEY);
+
+      // Create a new instance of Aedes broker using the options passed in
       let broker: Aedes = createBroker(options);
+
+      // If a port is provided in the options, create a server using the broker and listen on that port
       if (options.port) {
         await createServer(broker).listen(options.port);
       }
+
+      // If a WebSocket port is provided in the options, create a server using the broker with WebSocket enabled and listen on that port
       if (options.portWs) {
         await createServer(broker, { ws: true }).listen(options.portWs);
       }
+
+      // Return the created broker instance
       return broker;
     },
+    // Inject the Pigeon module options into the function
     inject: [PIGEON_OPTION_PROVIDER]
   };
 }
