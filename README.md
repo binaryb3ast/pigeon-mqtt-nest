@@ -16,8 +16,8 @@
 
 # Topics
 
-- [What is MQTT ?](#what-is-mqtt)
-- [What is Pigeon MQTT ?](#what-is-pigeon-mqtt)
+- [What is MQTT ?](#what-is-mqtt-)
+- [What is Pigeon MQTT ?](#what-is-pigeon-mqtt-)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Handlers](#handlers)
