@@ -17,6 +17,7 @@
 # Topics
 
 - [What is MQTT ?](#what-is-mqtt)
+- [What is Pigeon MQTT ?](#what-is-pigeon-mqtt)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Handlers](#handlers)
@@ -39,6 +40,16 @@ MQTT (Message Queuing Telemetry Transport) is an open source, lightweight messag
 This protocol provides a callable and cost-efficient way to connect devices using a publish/subscribe model. A
 communication system built on MQTT consists of the publishing server, a broker and one or more clients. It is designed
 for constrained devices and low-bandwidth, high-latency or unreliable networks.
+
+# What is Pigeon MQTT ?
+
+Pigeon-MQTT-Nest is a lightweight and easy-to-use library that provides a simple MQTT broker for your NestJS applications. With this library, you can easily integrate MQTT messaging into your NestJS application and communicate with MQTT clients using topics and messages.
+
+This library provides a customizable MQTT broker that can be easily integrated into your NestJS project. It uses the popular Eclipse Mosquitto library as the underlying MQTT broker engine and supports the MQTT 3.1, 3.1.1, and 5.0 protocol versions.
+
+Pigeon-MQTT-Nest is designed to be flexible and easy to use. It provides a simple API that allows you to create topics, subscribe to topics, and publish messages to topics with just a few lines of code. Additionally, it provides advanced features such as message persistence and quality of service (QoS) levels.
+
+Whether you're building a real-time chat application, IoT device management system, or any other kind of application that requires messaging, Pigeon-MQTT-Nest makes it easy to add MQTT messaging to your NestJS project.
 
 # Installation
 
