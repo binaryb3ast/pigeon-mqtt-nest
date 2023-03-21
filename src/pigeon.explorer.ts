@@ -1,3 +1,7 @@
+/**
+ * PigeonExplorer is a NestJS service that provides the functionality to set up MQTT topics and message listeners.
+ * It listens to the KEY_SUBSCRIBE_OPTIONS metadata and sets up the listeners based on the provided options.
+ */
 import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
 import { MetadataScanner, Reflector } from "@nestjs/core";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
@@ -46,6 +50,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   private readonly reflector = new Reflector();
   subscribers: PigeonSubscriber[];
 
+  // Initialize the PigeonExplorer class with necessary modules and services
   constructor(
     private readonly discoveryService: DiscoveryService,
     private readonly metadataScanner: MetadataScanner,
@@ -56,19 +61,21 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     this.subscribers = [];
   }
 
+  // Execute onModuleInit when the module is initialized
   onModuleInit() {
     Logger.log("Pigeon Explorer initialized", LOGGER_KEY);
     this.init();
   }
 
+  // Execute onApplicationShutdown when the application is shutting down
   async onApplicationShutdown(signal?: string) {
     Logger.error("Application Shutdown", LOGGER_KEY);
     await new Promise<void>((resolve) => this.broker.close(() => resolve()));
   }
 
-
+  // Initialize the broker and set up listeners
   async init() {
-
+    // Get providers from the KEY_SUBSCRIBE_OPTIONS metadata
     const providers: Array<DiscoveredMethodWithMetaAndParameters<string>> = (
       await this.discoveryService.providerMethodsWithMetaAtKey<string>(KEY_SUBSCRIBE_OPTIONS)
     ).map((p) => ({
@@ -76,6 +83,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       params: this.getMethodParameters(p)
     }));
 
+    // Set up preConnect listener
     const preConnect = this.getSubscribers(SystemTopicsEnum.PRE_CONNECT, providers, true);
     if (preConnect.length > 0) {
       this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
@@ -87,6 +95,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
+    // Set up clientDisconnect listener
     const clientDisconnect = this.getSubscribers(SystemTopicsEnum.CLIENT_DISCONNECT, providers);
     if (clientDisconnect.length > 0) {
       this.broker.on("clientDisconnect", (client: Client) => {
@@ -94,6 +103,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up authenticate listener
     const authenticate = this.getSubscribers(SystemTopicsEnum.AUTHENTICATE, providers, true);
     if (authenticate.length > 0) {
       this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, callback) => {
@@ -106,6 +116,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
+    // Set up authorizePublish listener
     const authorizePublish = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_PUBLISH, providers, true);
     if (authorizePublish.length > 0) {
       this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
@@ -117,6 +128,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
+    // Set up authorizeSubscribe listener
     const authorizeSubscribe = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_SUBSCRIBE, providers, true);
     if (authorizeSubscribe.length > 0) {
       this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
@@ -128,6 +140,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
+    // Set up authorizeForward listener
     const authorizeForward = this.getSubscribers(SystemTopicsEnum.AUTHORIZE_FORWARD, providers, true);
     if (authorizeForward.length > 0) {
       this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
@@ -138,6 +151,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
+    // Set up published listener
     const published = this.getSubscribers(SystemTopicsEnum.PUBLISHED, providers, true);
     if (published.length > 0) {
       this.broker.published = (packet: PublishPacket, client: Client, callback) => {
@@ -149,21 +163,26 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       };
     }
 
+    // Set up an event listener on the "publish" event of a broker object
     this.broker.on("publish", (packet: PublishPacket, client: Client) => {
       let subscriber;
 
+      // If the packet's topic matches the "HEART_BEAT" regular expression
       if (SystemTopicRegexEnum.HEART_BEAT.test(packet.topic)) {
+        // Retrieve the subscribers whose meta matches the "HEART_BEAT" regular expression
         subscriber = this.getSubscribers(SystemTopicRegexEnum.HEART_BEAT, providers);
       } else {
+        // Retrieve subscribers whose meta matches the packet's topic and subscribers whose meta matches the "PUBLISH" system topic
         subscriber = [
           ...this.getSubscribers(packet.topic, providers),
           ...this.getSubscribers(SystemTopicsEnum.PUBLISH, providers)
         ];
       }
-
+      // Call the `processHandlerListener` method with the retrieved subscribers and the client and packet information
       this.processHandlerListener(subscriber, { client, packet });
     });
 
+    // Set up clientReady listener
     const clientReady = this.getSubscribers(SystemTopicsEnum.CLIENT_READY, providers, true);
     if (clientReady.length > 0) {
       this.broker.on("clientReady", (client: Client) => {
@@ -171,6 +190,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up client listener
     const client = this.getSubscribers(SystemTopicsEnum.CLIENT, providers, true);
     if (client.length > 0) {
       this.broker.on("client", (c: Client) => {
@@ -178,7 +198,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
-
+    // Set up clientError listener
     const clientError = this.getSubscribers(SystemTopicsEnum.CLIENT_ERROR, providers, true);
     if (clientError.length > 0) {
       this.broker.on("clientError", (client: Client, error: Error) => {
@@ -186,6 +206,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up subscribe listener
     const subscribe = this.getSubscribers(SystemTopicsEnum.SUBSCRIBES, providers, true);
     if (subscribe.length > 0) {
       this.broker.on("subscribe", (subscriptions: Subscription[], client: Client) => {
@@ -196,6 +217,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up unsubscribe listener
     const unsubscribe = this.getSubscribers(SystemTopicsEnum.UNSUBSCRIBES, providers, true);
     if (unsubscribe.length > 0) {
       this.broker.on("unsubscribe", (unsubscription: string[], client: Client) => {
@@ -206,6 +228,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up ping listener
     const ping = this.getSubscribers(SystemTopicsEnum.PING, providers, true);
     if (ping.length > 0) {
       this.broker.on("ping", (packet: PingreqPacket, client: Client) => {
@@ -213,6 +236,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up connectionError listener
     const connectionError = this.getSubscribers(SystemTopicsEnum.CONNECTION_ERROR, providers, true);
     if (connectionError.length > 0) {
       this.broker.on("connectionError", (client: Client, error: Error) => {
@@ -220,6 +244,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up keepaliveTimeout listener
     const keepaliveTimeout = this.getSubscribers(SystemTopicsEnum.KEEP_LIVE_TIMEOUT, providers, true);
     if (keepaliveTimeout.length > 0) {
       this.broker.on("keepaliveTimeout", (client: Client) => {
@@ -227,6 +252,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up ack listener
     const ack = this.getSubscribers(SystemTopicsEnum.ACK, providers, true);
     if (ack.length > 0) {
       this.broker.on("ack", (packet: PublishPacket | PubrelPacket, client: Client) => {
@@ -234,6 +260,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up closed listener
     const closed = this.getSubscribers(SystemTopicsEnum.CLOSED, providers, true);
     if (closed.length > 0) {
       this.broker.on("closed", () => {
@@ -241,6 +268,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       });
     }
 
+    // Set up connackSent listener
     const connackSent = this.getSubscribers(SystemTopicsEnum.CONNACK_SENT, providers, true);
     if (connackSent.length > 0) {
       this.broker.on("connackSent", (packet: ConnackPacket, client: Client) => {
@@ -257,21 +285,27 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     }
   }
 
+  // This function takes in an array of subscribers and their parameters, then processes each subscriber's method.
+// If there's an error, it logs it using a logger.
   processHandlerListener(
     subscribers: DiscoveredMethodWithMetaAndParameters<string>[],
     params?: HandlerMethodParameters
   ) {
     for (const subscriber of subscribers) {
       try {
+        // Bind the handler method to the parent class's instance, then call it with the necessary parameters.
         subscriber.discoveredMethod.handler.bind(subscriber.discoveredMethod.parentClass.instance)(
           ...this.getHandlerMethodParameters(subscriber.params, params)
         );
       } catch (err) {
+        // Log any errors that occur during the call.
         this.logger.error(err);
       }
     }
   }
 
+  // This function takes in a subscriber, and returns an array of parameters for that subscriber's handler method.
+  // It does this by retrieving the MqttSubscriberParameter metadata using the reflector, then ordering them by index.
   private getMethodParameters(subscriber: DiscoveredMethodWithMeta<string>): MqttSubscriberParameter[] {
     const parameters = this.reflector.get<MqttSubscriberParameter[]>(
       KEY_SUBSCRIBER_PARAMS,
@@ -285,6 +319,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     return orderedParameters;
   }
 
+  // This function takes in a metaKey (either a string or RegExp), an array of providers,
+  // and a boolean indicating whether to only return the first match.
+  // It returns an array of all subscribers whose metadata matches the given metaKey.
   private getSubscribers(
     metaKey: string | RegExp,
     providers: DiscoveredMethodWithMetaAndParameters<string>[],
@@ -299,7 +336,8 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     return subscribers;
   }
 
-
+  // This function takes in an array of MqttSubscriberParameters and a HandlerMethodParameters object.
+  // It maps each parameter to its corresponding value from the HandlerMethodParameters object, then returns the resulting array.
   private getHandlerMethodParameters(parameters: MqttSubscriberParameter[], params?: HandlerMethodParameters) {
     return parameters.map((parameter) => {
       switch (parameter?.type) {
