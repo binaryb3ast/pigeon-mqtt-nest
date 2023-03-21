@@ -5,7 +5,7 @@ import { createClientProvider } from "pigeon.provider";
 import { PigeonService } from "pigeon.service";
 import { createLoggerProvider, createOptionProviders } from "option.provider";
 import { PigeonExplorer } from "pigeon.explorer";
-import { DiscoveryModule } from "@nestjs/core";
+import { DiscoveryModule } from "@golevelup/nestjs-discovery";
 
 @Global() // Indicates that this module should be available globally
 @Module({

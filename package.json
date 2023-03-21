@@ -8,6 +8,10 @@
   "types": "dist/index.d.ts",
   "readme": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/blob/main/README.md",
   "repository": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs",
+  "files": [
+    "dist",
+    "src"
+  ],
   "bugs": {
     "url": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/issues"
   },
