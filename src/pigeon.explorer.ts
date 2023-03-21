@@ -3,7 +3,7 @@
  * It listens to the KEY_SUBSCRIBE_OPTIONS metadata and sets up the listeners based on the provided options.
  */
 import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
-import { MetadataScanner, Reflector } from "@nestjs/core";
+import { Reflector } from "@nestjs/core";
 import { DiscoveredMethodWithMeta, DiscoveryService } from "@golevelup/nestjs-discovery";
 import {
   INSTANCE_BROKER,
@@ -51,7 +51,6 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   // Initialize the PigeonExplorer class with necessary modules and services
   constructor(
     private readonly discoveryService: DiscoveryService,
-    private readonly metadataScanner: MetadataScanner,
     @Inject(PIGEON_OPTION_PROVIDER) private readonly options: PigeonModuleOptions,
     @Inject(PIGEON_LOGGER_PROVIDER) private readonly logger: Logger,
     @Inject(INSTANCE_BROKER) private readonly broker: Aedes
