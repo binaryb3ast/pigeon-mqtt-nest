@@ -4,7 +4,6 @@
  */
 import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from "@nestjs/common";
 import { MetadataScanner, Reflector } from "@nestjs/core";
-import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import { DiscoveredMethodWithMeta, DiscoveryService } from "@golevelup/nestjs-discovery";
 import {
   INSTANCE_BROKER,
@@ -21,7 +20,6 @@ import { IPacket } from "mqtt-packet";
 
 import {
   PigeonModuleOptions,
-  MqttSubscribeOptions,
   PigeonSubscriber,
   MqttSubscriberParameter
 } from "pigeon.interface";
