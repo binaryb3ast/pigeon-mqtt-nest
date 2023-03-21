@@ -19,11 +19,13 @@ export function createClientProvider(): Provider {
       // If a port is provided in the options, create a server using the broker and listen on that port
       if (options.port) {
         await createServer(broker).listen(options.port);
+        Logger.log(`Creating TCP Server on Port ${options.port}...`, LOGGER_KEY);
       }
 
       // If a WebSocket port is provided in the options, create a server using the broker with WebSocket enabled and listen on that port
       if (options.portWs) {
         await createServer(broker, { ws: true }).listen(options.portWs);
+        Logger.log(`Creating WS Server on Port ${options.port}...`, LOGGER_KEY);
       }
 
       // Return the created broker instance

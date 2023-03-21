@@ -274,7 +274,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     }
 
     for (const provider of providers) {
-      this.logger.log(
+      Logger.log(
         `Mapped {${provider.discoveredMethod.parentClass.name}::${
           provider.discoveredMethod.methodName
         }, ${provider.params.map((p) => `${p.type}`).join(", ")}} mqtt subscribtion`
@@ -308,6 +308,10 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       KEY_SUBSCRIBER_PARAMS,
       subscriber.discoveredMethod.handler
     );
+
+    if (!Array.isArray(parameters)) {
+      return [];
+    }
 
     const orderedParameters: MqttSubscriberParameter[] = [];
     for (const parameter of parameters) {
