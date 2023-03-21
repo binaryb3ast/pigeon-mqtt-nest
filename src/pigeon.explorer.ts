@@ -13,7 +13,7 @@ import {
   KEY_SUBSCRIBER_PARAMS,
   SystemTopicsEnum, LOGGER_KEY, SystemTopicRegexEnum
 } from "pigeon.constant";
-import Aedes from "aedes/types/instance";
+import Aedes from "aedes";
 import { Client } from "aedes";
 import { ConnackPacket, ConnectPacket, PingreqPacket, PublishPacket, PubrelPacket, Subscription } from "aedes";
 import { IPacket } from "mqtt-packet";

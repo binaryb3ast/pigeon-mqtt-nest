@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { INSTANCE_BROKER } from "pigeon.constant";
 import { PubPacket } from "pigeon.interface";
-import Aedes from "aedes/types/instance";
+import Aedes from "aedes";
 
 @Injectable()
 export class PigeonService{
