@@ -5,12 +5,13 @@ import Aedes from "aedes/types/instance";
 
 @Injectable()
 export class PigeonService{
+
   constructor(
-    @Inject(INSTANCE_BROKER) private readonly broker:Aedes
+    @Inject(INSTANCE_BROKER) private readonly broker:Aedes // Injects the Aedes broker instance
   ) {
   }
 
-
+  // Publishes a message to a topic
   publish(packet: PubPacket): Promise<PubPacket> {
     return new Promise<any>((resolve, reject) => {
       this.broker.publish(packet, (error) => {
@@ -22,6 +23,7 @@ export class PigeonService{
     });
   }
 
+  // Closes the broker connection
   close(): Promise<string> {
     return new Promise<any>((resolve) => {
       this.broker.close(() => {
@@ -30,6 +32,7 @@ export class PigeonService{
     });
   }
 
+  // Returns the broker instance
   getBrokerInstance(): Aedes {
     return this.broker;
   }
