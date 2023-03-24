@@ -6,6 +6,10 @@ export const INSTANCE_BROKER = "INSTANCE_BROKER";
 export const PIGEON_OPTION_PROVIDER = "PIGEON_OPTION_PROVIDER";
 export const PIGEON_LOGGER_PROVIDER = "PIGEON_LOGGER_PROVIDER";
 
+export enum Transport {
+  TCP,
+  WS
+}
 
 export enum SystemTopicsEnum {
   PUBLISH = "$PIGEON/new/publish",

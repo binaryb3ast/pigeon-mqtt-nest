@@ -1,6 +1,7 @@
 import { AedesOptions, PublishPacket } from "aedes";
 import { LoggerService, Type } from "@nestjs/common";
 import { ModuleMetadata } from "@nestjs/common/interfaces";
+import { Transport } from "pigeon.constant";
 
 // Define a type for a function that can transform a message payload
 export type MqttMessageTransformer<T> = (payload: string | Buffer) => T;
@@ -56,8 +57,8 @@ export interface MqttLoggerOptions {
 
 // Options for configuring a Pigeon MQTT module
 export interface PigeonModuleOptions extends AedesOptions {
-  port?: number; // The port to listen on for MQTT connections
-  portWs?: number; // The port to listen on for MQTT over WebSockets connections
+  port : number; // The port to listen on for MQTT connections
+  transport: Transport ; // The port to listen on for MQTT over WebSockets connections
 }
 
 // Factory interface for creating Pigeon module options

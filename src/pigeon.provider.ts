@@ -2,7 +2,7 @@ import { Provider, Logger } from "@nestjs/common";
 import Aedes from "aedes";
 import { createBroker } from "aedes";
 import { PigeonModuleOptions } from "pigeon.interface";
-import { INSTANCE_BROKER, LOGGER_KEY, PIGEON_OPTION_PROVIDER } from "pigeon.constant";
+import { INSTANCE_BROKER, LOGGER_KEY, PIGEON_OPTION_PROVIDER, Transport } from "pigeon.constant";
 import { createServer } from "aedes-server-factory";
 
 // Define a provider function that creates a broker instance
@@ -12,19 +12,21 @@ export function createClientProvider(): Provider {
     useFactory: async (options: PigeonModuleOptions) => {
       // Log that a broker instance is being created
       Logger.log("Creating Broker Instance", LOGGER_KEY);
-
+      if (!options.transport){
+        Logger.log("Setting Default Transport For Mqtt < TCP >", LOGGER_KEY);
+        options.transport = Transport.TCP;
+      }
       // Create a new instance of Aedes broker using the options passed in
       let broker: Aedes = createBroker(options);
-
       // If a port is provided in the options, create a server using the broker and listen on that port
-      if (options.port) {
+      if (options.transport == Transport.TCP) {
         await createServer(broker).listen(options.port);
         Logger.log(`Creating TCP Server on Port ${options.port}...`, LOGGER_KEY);
       }
 
       // If a WebSocket port is provided in the options, create a server using the broker with WebSocket enabled and listen on that port
-      if (options.portWs) {
-        await createServer(broker, { ws: true }).listen(options.portWs);
+      if (options.transport == Transport.WS) {
+        await createServer(broker, { ws: true }).listen(options.port);
         Logger.log(`Creating WS Server on Port ${options.port}...`, LOGGER_KEY);
       }
 

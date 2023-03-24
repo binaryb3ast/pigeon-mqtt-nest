@@ -275,9 +275,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
 
     for (const provider of providers) {
       Logger.log(
-        `Mapped {${provider.discoveredMethod.parentClass.name}::${
+        `Mapped ${
           provider.discoveredMethod.methodName
-        }, ${provider.params.map((p) => `${p.type}`).join(", ")}} mqtt subscribtion`
+        }, ${provider.params.map((p) => `${p.type}`).join(", ")}} subscribtion`,provider.discoveredMethod.parentClass.name
       );
     }
   }
