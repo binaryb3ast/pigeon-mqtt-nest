@@ -158,6 +158,12 @@ export function Subscription() {
   });
 }
 
+export function Subscriptions() {
+  return SetParameter({
+    type: "subscriptions"
+  });
+}
+
 export function Unsubscription() {
   return SetParameter({
     type: "unsubscription"
