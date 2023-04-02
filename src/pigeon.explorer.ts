@@ -357,6 +357,8 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           return params?.subscription;
         case "subscriptions":
           return params?.subscriptions;
+        case "unsubscription":
+          return params?.unsubscription;
         case "payload":
           return getTransform(parameter.transform)((params?.packet as PublishPacket).payload);
         case "error":

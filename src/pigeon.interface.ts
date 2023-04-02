@@ -35,6 +35,7 @@ export interface MqttSubscriberParameter {
     | "host"
     | "subscription"
     | "subscriptions"
+    | "unsubscription"
     | "function"
     | "credential"; // The type of parameter being passed to the subscriber function
   transform?: "json" | "text" | MqttMessageTransformer<unknown>;

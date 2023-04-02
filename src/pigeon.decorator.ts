@@ -160,6 +160,12 @@ export function Subscription() {
   });
 }
 
+export function Unsubscription() {
+  return SetParameter({
+    type: "unsubscription"
+  });
+}
+
 export function Function() {
   return SetParameter({
     type: "function"
