@@ -329,7 +329,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     single = false
   ): DiscoveredMethodWithMetaAndParameters<string>[] {
     const subscribers = providers.filter((p) => {
-      return (isRegExp(metaKey) && metaKey.test(p.meta)) || p.meta === metaKey;
+      return (isRegExp(p.meta) && p.meta.test(String(metaKey))) || p.meta === metaKey;
     });
     if (single && subscribers.length > 0) {
       return [subscribers[0]];
