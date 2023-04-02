@@ -13,9 +13,7 @@ import {
 export function ListenOn(topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions): CustomDecorator;
 export function ListenOn(topicOrOptions): CustomDecorator {
   if (typeof topicOrOptions === "string" || Array.isArray(topicOrOptions)) {
-    return SetMetadata(KEY_SUBSCRIBE_OPTIONS, {
-      topic: topicOrOptions
-    });
+    return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topicOrOptions);
   } else {
     return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topicOrOptions);
   }
