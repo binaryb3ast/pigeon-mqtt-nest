@@ -2,8 +2,9 @@ import { Provider, Logger } from "@nestjs/common";
 import Aedes from "aedes";
 import { createBroker } from "aedes";
 import { PigeonModuleOptions } from "pigeon.interface";
-import { INSTANCE_BROKER, LOGGER_KEY, PIGEON_OPTION_PROVIDER, Transport } from "pigeon.constant";
+import { INSTANCE_BROKER, LOGGER_KEY, PIGEON_OPTION_PROVIDER } from "pigeon.constant";
 import { createServer } from "aedes-server-factory";
+import {Transport} from "enum/pigeon.transport.enum";
 
 // Define a provider function that creates a broker instance
 export function createClientProvider(): Provider {

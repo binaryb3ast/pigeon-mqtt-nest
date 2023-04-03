@@ -2,13 +2,14 @@ import { CustomDecorator, SetMetadata } from "@nestjs/common";
 import {
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
-  SystemTopicRegexEnum, SystemTopicsEnum
+  SystemTopicRegexEnum,
 } from "pigeon.constant";
 import {
   MqttMessageTransformer,
   MqttSubscribeOptions,
   MqttSubscriberParameter
 } from "pigeon.interface";
+import {Topics} from "enum/pigeon.topic.enum";
 
 export function ListenOn(topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions): CustomDecorator;
 export function ListenOn(topicOrOptions): CustomDecorator {
@@ -24,75 +25,75 @@ export function onHeartBeat(): CustomDecorator {
 }
 
 export function onPublish(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.PUBLISH);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.PUBLISH);
 }
 
 export function onClientReady(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CLIENT_READY);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT_READY);
 }
 
 export function onClient(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CLIENT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT);
 }
 
 export function onClientDisconnect(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CLIENT_DISCONNECT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT_DISCONNECT);
 }
 
 export function onClientError(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CLIENT_ERROR);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT_ERROR);
 }
 
 export function onSubscribe(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.SUBSCRIBES);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.SUBSCRIBES);
 }
 
 export function onUnsubscribe(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.UNSUBSCRIBES);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.UNSUBSCRIBES);
 }
 
 export function onAuthenticate(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.AUTHENTICATE);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHENTICATE);
 }
 
 export function onPreConnect(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.PRE_CONNECT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.PRE_CONNECT);
 }
 
 export function onAuthorizePublish(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.AUTHORIZE_PUBLISH);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHORIZE_PUBLISH);
 }
 
 export function onAuthorizeSubscribe(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.AUTHORIZE_SUBSCRIBE);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHORIZE_SUBSCRIBE);
 }
 
 export function onAuthorizeForward(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.AUTHORIZE_FORWARD);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHORIZE_FORWARD);
 }
 
 export function onPublished(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.PUBLISHED);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.PUBLISHED);
 }
 
 export function onKeepLiveTimeout(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.KEEP_LIVE_TIMEOUT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.KEEP_LIVE_TIMEOUT);
 }
 
 export function onAck(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.ACK);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.ACK);
 }
 
 export function onConnackSent(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CONNACK_SENT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CONNACK_SENT);
 }
 
 export function onClosed(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CLOSED);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLOSED);
 }
 
 export function onConnectionError(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicsEnum.CONNECTION_ERROR);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CONNECTION_ERROR);
 }
 
 

@@ -1,7 +1,8 @@
 import { AedesOptions, PublishPacket } from "aedes";
 import { LoggerService, Type } from "@nestjs/common";
 import { ModuleMetadata } from "@nestjs/common/interfaces";
-import { Transport } from "pigeon.constant";
+import {Transport} from "enum/pigeon.transport.enum";
+
 
 // Define a type for a function that can transform a message payload
 export type MqttMessageTransformer<T> = (payload: string | Buffer) => T;
