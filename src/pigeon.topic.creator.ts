@@ -1,3 +1,5 @@
+import {EventType} from "enum/pigeon.eventtype.enum";
+
 function generatePatternRegex(pattern: string): RegExp {
     const regexPattern = pattern
         .replace(/:[^/]+/g, "([^/]+)")
@@ -11,16 +13,16 @@ function isRegExp(value: any): boolean {
     return value instanceof RegExp || (typeof value === "object" && Object.prototype.toString.call(value) === "[object RegExp]");
 }
 
-export function getTopicType(topic: any) {
+export function getTopicType(topic: any): EventType {
     if (typeof topic === "string") {
         if (test.test(topic)) {
-            return "segment";
+            return EventType.SEGMENT;
         }
-        return "string";
+        return EventType.STRING;
     } else if (isRegExp(topic)) {
-        return "regexp";
+        return EventType.REGEXP;
     } else if (Array.isArray(topic) && topic.every(elem => typeof elem === "string")) {
-        return "arr_string";
+        return EventType.ARR_STRING;
     } else if (Array.isArray(topic) && topic.every(elem => {
         try {
             new RegExp(elem);
@@ -29,9 +31,9 @@ export function getTopicType(topic: any) {
             return false;
         }
     })) {
-        return "arr_regexp";
+        return EventType.ARR_REGEXP;
     } else {
-        return "unknown";
+        return EventType.UNKNOWN;
     }
 }
 
