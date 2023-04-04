@@ -1,5 +1,5 @@
 import {EventType} from "enum/pigeon.eventtype.enum";
-import {isEveryElementRegExp, isEveryElementString, isRegExp, isSegmentUrl} from "pigeon.validator";
+import {isEveryElementRegExp, isEveryElementString, isRegExp, isSegmentUrl, isString} from "pigeon.validator";
 
 function generatePatternRegex(pattern: string): RegExp {
     const regexPattern = pattern
@@ -9,7 +9,7 @@ function generatePatternRegex(pattern: string): RegExp {
 }
 
 export function getTopicType(topic: any): EventType {
-    if (typeof topic === "string") {
+    if (isString(topic)) {
         if (isSegmentUrl(topic)) {
             return EventType.SEGMENT;
         }
