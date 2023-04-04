@@ -1,5 +1,5 @@
 import {EventType} from "enum/pigeon.eventtype.enum";
-import {isRegExp, isSegmentUrl} from "pigeon.validator";
+import {isEveryElementRegExp, isEveryElementString, isRegExp, isSegmentUrl} from "pigeon.validator";
 
 function generatePatternRegex(pattern: string): RegExp {
     const regexPattern = pattern
@@ -16,16 +16,9 @@ export function getTopicType(topic: any): EventType {
         return EventType.STRING;
     } else if (isRegExp(topic)) {
         return EventType.REGEXP;
-    } else if (Array.isArray(topic) && topic.every(elem => typeof elem === "string")) {
+    } else if (Array.isArray(topic) && isEveryElementString(topic)) {
         return EventType.ARR_STRING;
-    } else if (Array.isArray(topic) && topic.every(elem => {
-        try {
-            new RegExp(elem);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    })) {
+    } else if (Array.isArray(topic) && isEveryElementRegExp(topic)) {
         return EventType.ARR_REGEXP;
     } else {
         return EventType.UNKNOWN;
