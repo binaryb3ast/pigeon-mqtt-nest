@@ -8,6 +8,14 @@ export function isSegmentUrl(url: any): boolean {
     return isString(url) && SEGMENT_PATTERN_REGEXP.test(url)
 }
 
+export function isSystemTopic(topic: string): boolean {
+    return topic.startsWith("$PIGEON");
+}
+
+export function isSystemTopicRegExp(topic: string): boolean {
+    return SystemTopics.HEART_BEAT.toString() == topic.toString();
+}
+
 export function isString(value: any) {
     return typeof value === "string";
 }
