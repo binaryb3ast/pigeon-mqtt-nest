@@ -11,7 +11,7 @@ import {
     PIGEON_OPTION_PROVIDER,
     KEY_SUBSCRIBE_OPTIONS,
     KEY_SUBSCRIBER_PARAMS,
-    LOGGER_KEY, SystemTopicRegexEnum
+    LOGGER_KEY,
 } from "pigeon.constant";
 import Aedes from "aedes";
 import {Client} from "aedes";

@@ -2,7 +2,6 @@ import { CustomDecorator, SetMetadata } from "@nestjs/common";
 import {
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
-  SystemTopicRegexEnum,
 } from "pigeon.constant";
 import {
   MqttMessageTransformer,
@@ -21,7 +20,7 @@ export function ListenOn(topicOrOptions): CustomDecorator {
 }
 
 export function onHeartBeat(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopicRegexEnum.HEART_BEAT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.HEART_BEAT);
 }
 
 export function onPublish(): CustomDecorator {
