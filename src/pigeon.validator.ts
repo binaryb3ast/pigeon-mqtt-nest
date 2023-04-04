@@ -5,10 +5,7 @@ export function isRegExp(value: any): boolean {
 }
 
 export function isSegmentUrl(url: any): boolean {
-    if (!isString(url)) {
-        return false;
-    }
-    return SEGMENT_PATTERN_REGEXP.test(url)
+    return isString(url) && SEGMENT_PATTERN_REGEXP.test(url)
 }
 
 export function isString(value: any) {
@@ -16,21 +13,15 @@ export function isString(value: any) {
 }
 
 export function isEveryElementString(arr: any): boolean {
-    if (!Array.isArray(arr)) {
-        return false;
-    }
-    return arr.every(elem => typeof elem === "string")
+    return Array.isArray(arr) && arr.every(elem => typeof elem === "string")
 }
 
 export function isEveryElementRegExp(arr: any): boolean {
-    if (!Array.isArray(arr)) {
-        return false;
-    }
-    return arr.every(elem => {
+    return Array.isArray(arr) && arr.every(elem => {
         try {
             new RegExp(elem);
             return true;
-        } catch (e) {
+        } catch {
             return false;
         }
     })
