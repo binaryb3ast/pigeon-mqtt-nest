@@ -9,7 +9,7 @@ import {
   MqttSubscribeOptions,
   MqttSubscriberParameter
 } from "pigeon.interface";
-import {Topics} from "enum/pigeon.topic.enum";
+import {SystemTopics} from "enum/pigeon.topic.enum";
 
 export function ListenOn(topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions): CustomDecorator;
 export function ListenOn(topicOrOptions): CustomDecorator {
@@ -25,75 +25,75 @@ export function onHeartBeat(): CustomDecorator {
 }
 
 export function onPublish(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.PUBLISH);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.PUBLISH);
 }
 
 export function onClientReady(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT_READY);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CLIENT_READY);
 }
 
 export function onClient(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CLIENT);
 }
 
 export function onClientDisconnect(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT_DISCONNECT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CLIENT_DISCONNECT);
 }
 
 export function onClientError(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLIENT_ERROR);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CLIENT_ERROR);
 }
 
 export function onSubscribe(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.SUBSCRIBES);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.SUBSCRIBES);
 }
 
 export function onUnsubscribe(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.UNSUBSCRIBES);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.UNSUBSCRIBES);
 }
 
 export function onAuthenticate(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHENTICATE);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.AUTHENTICATE);
 }
 
 export function onPreConnect(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.PRE_CONNECT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.PRE_CONNECT);
 }
 
 export function onAuthorizePublish(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHORIZE_PUBLISH);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.AUTHORIZE_PUBLISH);
 }
 
 export function onAuthorizeSubscribe(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHORIZE_SUBSCRIBE);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.AUTHORIZE_SUBSCRIBE);
 }
 
 export function onAuthorizeForward(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.AUTHORIZE_FORWARD);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.AUTHORIZE_FORWARD);
 }
 
 export function onPublished(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.PUBLISHED);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.PUBLISHED);
 }
 
 export function onKeepLiveTimeout(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.KEEP_LIVE_TIMEOUT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.KEEP_LIVE_TIMEOUT);
 }
 
 export function onAck(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.ACK);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.ACK);
 }
 
 export function onConnackSent(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CONNACK_SENT);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CONNACK_SENT);
 }
 
 export function onClosed(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CLOSED);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CLOSED);
 }
 
 export function onConnectionError(): CustomDecorator {
-  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, Topics.CONNECTION_ERROR);
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CONNECTION_ERROR);
 }
 
 

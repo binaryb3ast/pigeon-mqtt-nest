@@ -1,4 +1,4 @@
-export enum Topics {
+export enum SystemTopics {
     PUBLISH = "$PIGEON/new/publish",
     CLIENT_READY = "$PIGEON/event/ready/clients",
     CLIENT = "$PIGEON/event/clients",

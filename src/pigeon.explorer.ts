@@ -25,7 +25,7 @@ import {
 } from "pigeon.interface";
 import {isRegExp} from "util/types";
 import {getTransform} from "pigeon.transfrom";
-import {Topics} from "enum/pigeon.topic.enum";
+import {SystemTopics} from "enum/pigeon.topic.enum";
 
 type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
     params: MqttSubscriberParameter[];
@@ -82,7 +82,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }));
 
         // Set up preConnect listener
-        const preConnect = this.getSubscribers(Topics.PRE_CONNECT, providers, true);
+        const preConnect = this.getSubscribers(SystemTopics.PRE_CONNECT, providers, true);
         if (preConnect.length > 0) {
             this.broker.preConnect = (client: Client, packet: ConnectPacket, callback) => {
                 this.processHandlerListener(preConnect, {
@@ -94,7 +94,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up clientDisconnect listener
-        const clientDisconnect = this.getSubscribers(Topics.CLIENT_DISCONNECT, providers);
+        const clientDisconnect = this.getSubscribers(SystemTopics.CLIENT_DISCONNECT, providers);
         if (clientDisconnect.length > 0) {
             this.broker.on("clientDisconnect", (client: Client) => {
                 this.processHandlerListener(clientDisconnect, {client});
@@ -102,7 +102,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up authenticate listener
-        const authenticate = this.getSubscribers(Topics.AUTHENTICATE, providers, true);
+        const authenticate = this.getSubscribers(SystemTopics.AUTHENTICATE, providers, true);
         if (authenticate.length > 0) {
             this.broker.authenticate = (client: Client, username: Readonly<string>, password: Readonly<Buffer>, callback) => {
                 this.processHandlerListener(authenticate, {
@@ -115,7 +115,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up authorizePublish listener
-        const authorizePublish = this.getSubscribers(Topics.AUTHORIZE_PUBLISH, providers, true);
+        const authorizePublish = this.getSubscribers(SystemTopics.AUTHORIZE_PUBLISH, providers, true);
         if (authorizePublish.length > 0) {
             this.broker.authorizePublish = (client: Client, packet: PublishPacket, callback) => {
                 this.processHandlerListener(authorizePublish, {
@@ -127,7 +127,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up authorizeSubscribe listener
-        const authorizeSubscribe = this.getSubscribers(Topics.AUTHORIZE_SUBSCRIBE, providers, true);
+        const authorizeSubscribe = this.getSubscribers(SystemTopics.AUTHORIZE_SUBSCRIBE, providers, true);
         if (authorizeSubscribe.length > 0) {
             this.broker.authorizeSubscribe = (client: Client, subscription: Subscription, callback) => {
                 this.processHandlerListener(authorizeSubscribe, {
@@ -139,7 +139,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up authorizeForward listener
-        const authorizeForward = this.getSubscribers(Topics.AUTHORIZE_FORWARD, providers, true);
+        const authorizeForward = this.getSubscribers(SystemTopics.AUTHORIZE_FORWARD, providers, true);
         if (authorizeForward.length > 0) {
             this.broker.authorizeForward = (client: Client, packet: PublishPacket) => {
                 this.processHandlerListener(authorizeForward, {
@@ -150,7 +150,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up published listener
-        const published = this.getSubscribers(Topics.PUBLISHED, providers, true);
+        const published = this.getSubscribers(SystemTopics.PUBLISHED, providers, true);
         if (published.length > 0) {
             this.broker.published = (packet: PublishPacket, client: Client, callback) => {
                 this.processHandlerListener(published, {
@@ -173,7 +173,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
                 // Retrieve subscribers whose meta matches the packet's topic and subscribers whose meta matches the "PUBLISH" system topic
                 subscriber = [
                     ...this.getSubscribers(packet.topic, providers),
-                    ...this.getSubscribers(Topics.PUBLISH, providers)
+                    ...this.getSubscribers(SystemTopics.PUBLISH, providers)
                 ];
             }
             // Call the `processHandlerListener` method with the retrieved subscribers and the client and packet information
@@ -181,7 +181,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         });
 
         // Set up clientReady listener
-        const clientReady = this.getSubscribers(Topics.CLIENT_READY, providers, true);
+        const clientReady = this.getSubscribers(SystemTopics.CLIENT_READY, providers, true);
         if (clientReady.length > 0) {
             this.broker.on("clientReady", (client: Client) => {
                 this.processHandlerListener(clientReady, {client});
@@ -189,7 +189,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up client listener
-        const client = this.getSubscribers(Topics.CLIENT, providers, true);
+        const client = this.getSubscribers(SystemTopics.CLIENT, providers, true);
         if (client.length > 0) {
             this.broker.on("client", (c: Client) => {
                 this.processHandlerListener(client, {client: c});
@@ -197,7 +197,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up clientError listener
-        const clientError = this.getSubscribers(Topics.CLIENT_ERROR, providers, true);
+        const clientError = this.getSubscribers(SystemTopics.CLIENT_ERROR, providers, true);
         if (clientError.length > 0) {
             this.broker.on("clientError", (client: Client, error: Error) => {
                 this.processHandlerListener(clientError, {client, error});
@@ -205,7 +205,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up subscribe listener
-        const subscribe = this.getSubscribers(Topics.SUBSCRIBES, providers, true);
+        const subscribe = this.getSubscribers(SystemTopics.SUBSCRIBES, providers, true);
         if (subscribe.length > 0) {
             this.broker.on("subscribe", (subscriptions: Subscription[], client: Client) => {
                 this.processHandlerListener(subscribe, {
@@ -216,7 +216,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up unsubscribe listener
-        const unsubscribe = this.getSubscribers(Topics.UNSUBSCRIBES, providers, true);
+        const unsubscribe = this.getSubscribers(SystemTopics.UNSUBSCRIBES, providers, true);
         if (unsubscribe.length > 0) {
             this.broker.on("unsubscribe", (unsubscription: string[], client: Client) => {
                 this.processHandlerListener(unsubscribe, {
@@ -227,7 +227,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up ping listener
-        const ping = this.getSubscribers(Topics.PING, providers, true);
+        const ping = this.getSubscribers(SystemTopics.PING, providers, true);
         if (ping.length > 0) {
             this.broker.on("ping", (packet: PingreqPacket, client: Client) => {
                 this.processHandlerListener(ping, {client, packet});
@@ -235,7 +235,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up connectionError listener
-        const connectionError = this.getSubscribers(Topics.CONNECTION_ERROR, providers, true);
+        const connectionError = this.getSubscribers(SystemTopics.CONNECTION_ERROR, providers, true);
         if (connectionError.length > 0) {
             this.broker.on("connectionError", (client: Client, error: Error) => {
                 this.processHandlerListener(connectionError, {client, error});
@@ -243,7 +243,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up keepaliveTimeout listener
-        const keepaliveTimeout = this.getSubscribers(Topics.KEEP_LIVE_TIMEOUT, providers, true);
+        const keepaliveTimeout = this.getSubscribers(SystemTopics.KEEP_LIVE_TIMEOUT, providers, true);
         if (keepaliveTimeout.length > 0) {
             this.broker.on("keepaliveTimeout", (client: Client) => {
                 this.processHandlerListener(keepaliveTimeout, {client});
@@ -251,7 +251,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up ack listener
-        const ack = this.getSubscribers(Topics.ACK, providers, true);
+        const ack = this.getSubscribers(SystemTopics.ACK, providers, true);
         if (ack.length > 0) {
             this.broker.on("ack", (packet: PublishPacket | PubrelPacket, client: Client) => {
                 this.processHandlerListener(ack, {client, packet});
@@ -259,7 +259,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up closed listener
-        const closed = this.getSubscribers(Topics.CLOSED, providers, true);
+        const closed = this.getSubscribers(SystemTopics.CLOSED, providers, true);
         if (closed.length > 0) {
             this.broker.on("closed", () => {
                 this.processHandlerListener(closed);
@@ -267,7 +267,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         }
 
         // Set up connackSent listener
-        const connackSent = this.getSubscribers(Topics.CONNACK_SENT, providers, true);
+        const connackSent = this.getSubscribers(SystemTopics.CONNACK_SENT, providers, true);
         if (connackSent.length > 0) {
             this.broker.on("connackSent", (packet: ConnackPacket, client: Client) => {
                 this.processHandlerListener(connackSent, {client, packet});
