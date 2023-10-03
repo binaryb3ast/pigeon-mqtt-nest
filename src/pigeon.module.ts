@@ -30,7 +30,7 @@ export class PigeonModule {
 
   public static forRoot(options: PigeonModuleOptions): DynamicModule {
     return {
-      module: PigeonModule, // Current module
+      module: PigeonModule, // Current module,
       providers: [
         {
           provide: PIGEON_OPTION_PROVIDER, // Provider token for the Pigeon options

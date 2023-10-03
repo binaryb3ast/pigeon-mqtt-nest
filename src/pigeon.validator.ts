@@ -1,3 +1,5 @@
+import { SystemTopics } from "enum/pigeon.topic.enum";
+
 const SEGMENT_PATTERN_REGEXP = /^((\w+\/)*):?\w+((\/:\w+)+)?$/g;
 
 export function isRegExp(value: any): boolean {

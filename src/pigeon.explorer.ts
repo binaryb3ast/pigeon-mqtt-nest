@@ -166,9 +166,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
             let subscriber;
 
             // If the packet's topic matches the "HEART_BEAT" regular expression
-            if (SystemTopicRegexEnum.HEART_BEAT.test(packet.topic)) {
+            if (SystemTopics.HEART_BEAT.test(packet.topic)) {
                 // Retrieve the subscribers whose meta matches the "HEART_BEAT" regular expression
-                subscriber = this.getSubscribers(SystemTopicRegexEnum.HEART_BEAT, providers);
+                subscriber = this.getSubscribers(SystemTopics.HEART_BEAT, providers);
             } else {
                 // Retrieve subscribers whose meta matches the packet's topic and subscribers whose meta matches the "PUBLISH" system topic
                 subscriber = [
