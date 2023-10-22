@@ -43,10 +43,16 @@ import { isRegExp } from 'util/types';
 import { getTransform } from 'pigeon.transfrom';
 import { SystemTopics } from 'enum/pigeon.topic.enum';
 
+/**
+ * Type representing a method discovered with metadata and parameters.
+ */
 type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
   params: MqttSubscriberParameter[];
 };
 
+/**
+ * Type representing the parameters of handler methods.
+ */
 type HandlerMethodParameters = {
   client?: Client;
   packet?: IPacket;
@@ -59,12 +65,21 @@ type HandlerMethodParameters = {
   error?;
 };
 
+/**
+ * PigeonExplorer is a service that handles MQTT topic setup and message listeners.
+ */
 @Injectable()
 export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   private readonly reflector = new Reflector();
   subscribers: PigeonSubscriber[];
 
-  // Initialize the PigeonExplorer class with necessary modules and services
+  /**
+   * Initializes the PigeonExplorer class with necessary modules and services.
+   * @param discoveryService - The DiscoveryService for discovering providers.
+   * @param options - The PigeonModuleOptions for MQTT setup.
+   * @param logger - The Logger instance.
+   * @param broker - The MQTT broker instance.
+   */
   constructor(
     private readonly discoveryService: DiscoveryService,
     @Inject(PIGEON_OPTION_PROVIDER)
@@ -75,19 +90,26 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     this.subscribers = [];
   }
 
-  // Execute onModuleInit when the module is initialized
+  /**
+   * Executes onModuleInit when the module is initialized.
+   */
   onModuleInit() {
     Logger.log('Pigeon Explorer initialized', LOGGER_KEY);
     this.init();
   }
 
-  // Execute onApplicationShutdown when the application is shutting down
+  /**
+   * Executes onApplicationShutdown when the application is shutting down.
+   * @param signal - The signal for shutting down.
+   */
   async onApplicationShutdown(signal?: string) {
     Logger.error('Application Shutdown', LOGGER_KEY);
     await new Promise<void>((resolve) => this.broker.close(() => resolve()));
   }
 
-  // Initialize the broker and set up listeners
+  /**
+   * Initializes the MQTT broker and sets up message listeners.
+   */
   async init() {
     // Get providers from the KEY_SUBSCRIBE_OPTIONS metadata
     const providers: Array<DiscoveredMethodWithMetaAndParameters<string>> = (
@@ -488,6 +510,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     });
   }
 
+  /**
+   * Returns the MQTT broker host information.
+   */
   getHost() {
     return {
       id: this.broker.id,
