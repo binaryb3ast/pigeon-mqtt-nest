@@ -1,3 +1,7 @@
+/**
+ * The PigeonModule is a NestJS global module that provides MQTT functionality using the Pigeon library.
+ * It includes options for configuring MQTT connections and exports the PigeonService to be used in other modules.
+ */
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import {
   PigeonModuleAsyncOptions,
@@ -16,6 +20,11 @@ import { DiscoveryModule } from '@golevelup/nestjs-discovery';
   exports: [PigeonService], // Exporting PigeonService to make it available for other modules to use
 })
 export class PigeonModule {
+  /**
+   * Creates a dynamic module for configuring the Pigeon MQTT service asynchronously.
+   * @param options - An asynchronous configuration for Pigeon MQTT.
+   * @returns A dynamic module with necessary providers and imports.
+   */
   public static forRootAsync(options: PigeonModuleAsyncOptions): DynamicModule {
     return {
       module: PigeonModule, // Current module
@@ -29,6 +38,11 @@ export class PigeonModule {
     };
   }
 
+  /**
+   * Creates a dynamic module for configuring the Pigeon MQTT service.
+   * @param options - Configuration options for Pigeon MQTT.
+   * @returns A dynamic module with necessary providers and imports.
+   */
   public static forRoot(options: PigeonModuleOptions): DynamicModule {
     return {
       module: PigeonModule, // Current module
