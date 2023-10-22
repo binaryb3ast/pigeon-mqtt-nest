@@ -11,7 +11,11 @@ import {
   PIGEON_OPTION_PROVIDER,
 } from 'pigeon.constant';
 
-// Function that creates a NestJS provider for Pigeon MQTT options
+/**
+ * Function that creates a NestJS provider for Pigeon MQTT options.
+ * @param options - The PigeonModuleAsyncOptions containing options for Pigeon MQTT.
+ * @returns A NestJS provider for Pigeon MQTT options.
+ */
 export function createOptionsProvider(
   options: PigeonModuleAsyncOptions,
 ): Provider {
@@ -35,7 +39,11 @@ export function createOptionsProvider(
   }
 }
 
-// Function that creates a collection of NestJS providers for Pigeon MQTT options and the MQTT broker instance
+/**
+ * Function that creates a collection of NestJS providers for Pigeon MQTT options and the MQTT broker instance.
+ * @param options - The PigeonModuleAsyncOptions containing options for Pigeon MQTT.
+ * @returns An array of NestJS providers for Pigeon MQTT options and the MQTT broker instance.
+ */
 export function createOptionProviders(
   options: PigeonModuleAsyncOptions,
 ): Provider[] {
@@ -60,7 +68,11 @@ export function createOptionProviders(
   ];
 }
 
-// Function that creates a NestJS provider for the Logger class
+/**
+ * Function that creates a NestJS provider for the Logger class.
+ * @param options - The PigeonModuleOptions or PigeonModuleAsyncOptions.
+ * @returns A NestJS provider for the Logger instance.
+ */
 export function createLoggerProvider(
   options: PigeonModuleOptions | PigeonModuleAsyncOptions,
 ): Provider {
