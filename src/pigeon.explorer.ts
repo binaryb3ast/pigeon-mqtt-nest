@@ -103,7 +103,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
    * @param signal - The signal for shutting down.
    */
   async onApplicationShutdown(signal?: string) {
-    Logger.error('Application Shutdown', LOGGER_KEY);
+    Logger.error(`Application Shutdown Signal: ${signal}`, LOGGER_KEY);
     await new Promise<void>((resolve) => this.broker.close(() => resolve()));
   }
 
