@@ -10,7 +10,10 @@ import {
 import { createServer } from 'aedes-server-factory';
 import { Transport } from 'enum/pigeon.transport.enum';
 
-// Define a provider function that creates a broker instance
+/**
+ * Creates a provider function that generates a Pigeon MQTT broker instance based on the provided options.
+ * @returns A provider configuration object for the Pigeon MQTT broker.
+ */
 export function createClientProvider(): Provider {
   return {
     provide: INSTANCE_BROKER,
