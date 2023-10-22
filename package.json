@@ -1,7 +1,7 @@
 {
   "name": "pigeon-mqtt-nest",
-  "version": "1.0.17",
-  "description": "Nest.js MQTT broker that can run on any stream server",
+  "version": "1.0.18",
+  "description": "pigeon-mqtt-nest is an NPM package that simplifies the process of integrating an MQTT broker into Nest JS applications.",
   "author": "Behnam Nasehi <behnammnasehi@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",

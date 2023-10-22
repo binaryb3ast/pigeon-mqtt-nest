@@ -74,6 +74,7 @@ export function createOptionProviders(
  * @returns A NestJS provider for the Logger instance.
  */
 export function createLoggerProvider(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   options: PigeonModuleOptions | PigeonModuleAsyncOptions,
 ): Provider {
   Logger.log('Creating Logger Provider', LOGGER_KEY);
