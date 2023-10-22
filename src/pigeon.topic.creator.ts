@@ -9,6 +9,11 @@ import {
   isSystemTopicRegExp,
 } from 'pigeon.validator';
 
+/**
+ * Generates a regular expression from a pattern string, replacing path segments with regex capture groups.
+ * @param pattern - The pattern string to convert to a regular expression.
+ * @returns A regular expression pattern matching the provided string pattern.
+ */
 function generatePatternRegex(pattern: string): RegExp {
   const regexPattern = pattern
     .replace(/:[^/]+/g, '([^/]+)')
@@ -16,6 +21,11 @@ function generatePatternRegex(pattern: string): RegExp {
   return new RegExp(`^${regexPattern}$`);
 }
 
+/**
+ * Determines the type of the provided MQTT topic.
+ * @param topic - The MQTT topic to evaluate.
+ * @returns The type of the MQTT topic (e.g., SEGMENT, STRING, REGEXP, etc.).
+ */
 export function getTopicType(topic: any): EventType {
   if (isString(topic)) {
     if (isSystemTopic(topic)) {
@@ -38,6 +48,12 @@ export function getTopicType(topic: any): EventType {
   }
 }
 
+/**
+ * Extracts URL segments from a URL based on a provided pattern.
+ * @param url - The URL string to extract segments from.
+ * @param pattern - The pattern used to extract segments from the URL.
+ * @returns An object containing extracted segments and their values.
+ */
 export function extractSegments(url: string, pattern: string): object {
   const patternRegex = generatePatternRegex(pattern);
   const match = patternRegex.exec(url);
