@@ -1,15 +1,13 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { INSTANCE_BROKER } from "pigeon.constant";
-import { PubPacket } from "pigeon.interface";
-import Aedes from "aedes";
+import { Inject, Injectable } from '@nestjs/common';
+import { INSTANCE_BROKER } from 'pigeon.constant';
+import { PubPacket } from 'pigeon.interface';
+import Aedes from 'aedes';
 
 @Injectable()
-export class PigeonService{
-
+export class PigeonService {
   constructor(
-    @Inject(INSTANCE_BROKER) private readonly broker:Aedes // Injects the Aedes broker instance
-  ) {
-  }
+    @Inject(INSTANCE_BROKER) private readonly broker: Aedes, // Injects the Aedes broker instance
+  ) {}
 
   // Publishes a message to a topic
   publish(packet: PubPacket): Promise<PubPacket> {
@@ -27,7 +25,7 @@ export class PigeonService{
   close(): Promise<string> {
     return new Promise<any>((resolve) => {
       this.broker.close(() => {
-        resolve("success");
+        resolve('success');
       });
     });
   }
@@ -40,5 +38,4 @@ export class PigeonService{
   //todo: subscribe function
 
   //todo: unsubscribe function
-
 }

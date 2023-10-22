@@ -1,18 +1,17 @@
-import { CustomDecorator, SetMetadata } from "@nestjs/common";
-import {
-  KEY_SUBSCRIBE_OPTIONS,
-  KEY_SUBSCRIBER_PARAMS,
-} from "pigeon.constant";
+import { CustomDecorator, SetMetadata } from '@nestjs/common';
+import { KEY_SUBSCRIBE_OPTIONS, KEY_SUBSCRIBER_PARAMS } from 'pigeon.constant';
 import {
   MqttMessageTransformer,
   MqttSubscribeOptions,
-  MqttSubscriberParameter
-} from "pigeon.interface";
-import {SystemTopics} from "enum/pigeon.topic.enum";
+  MqttSubscriberParameter,
+} from 'pigeon.interface';
+import { SystemTopics } from 'enum/pigeon.topic.enum';
 
-export function ListenOn(topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions): CustomDecorator;
+export function ListenOn(
+  topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions,
+): CustomDecorator;
 export function ListenOn(topicOrOptions): CustomDecorator {
-  if (typeof topicOrOptions === "string" || Array.isArray(topicOrOptions)) {
+  if (typeof topicOrOptions === 'string' || Array.isArray(topicOrOptions)) {
     return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topicOrOptions);
   } else {
     return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topicOrOptions);
@@ -95,18 +94,13 @@ export function onConnectionError(): CustomDecorator {
   return SetMetadata(KEY_SUBSCRIBE_OPTIONS, SystemTopics.CONNECTION_ERROR);
 }
 
-
 function SetParameter(parameter: Partial<MqttSubscriberParameter>) {
-  return (
-    target: object,
-    propertyKey: string | symbol,
-    paramIndex: number
-  ) => {
+  return (target: object, propertyKey: string | symbol, paramIndex: number) => {
     const params =
       Reflect.getMetadata(KEY_SUBSCRIBER_PARAMS, target[propertyKey]) || [];
     params.push({
       index: paramIndex,
-      ...parameter
+      ...parameter,
     });
     Reflect.defineMetadata(KEY_SUBSCRIBER_PARAMS, params, target[propertyKey]);
   };
@@ -118,7 +112,7 @@ function SetParameter(parameter: Partial<MqttSubscriberParameter>) {
  */
 export function Topic() {
   return SetParameter({
-    type: "topic"
+    type: 'topic',
   });
 }
 
@@ -127,17 +121,21 @@ export function Topic() {
  * @param transform
  * @constructor
  */
-export function Payload(transform?: "json" | "text" | MqttMessageTransformer<unknown>) {
+export function Payload(
+  transform?: 'json' | 'text' | MqttMessageTransformer<unknown>,
+) {
   return SetParameter({
-    type: "payload",
-    transform
+    type: 'payload',
+    transform,
   });
 }
 
-export function Client(transform?: "json" | "text" | MqttMessageTransformer<unknown>) {
+export function Client(
+  transform?: 'json' | 'text' | MqttMessageTransformer<unknown>,
+) {
   return SetParameter({
-    type: "client",
-    transform
+    type: 'client',
+    transform,
   });
 }
 
@@ -148,48 +146,48 @@ export function Client(transform?: "json" | "text" | MqttMessageTransformer<unkn
  */
 export function Packet() {
   return SetParameter({
-    type: "packet"
+    type: 'packet',
   });
 }
 
 export function Subscription() {
   return SetParameter({
-    type: "subscription"
+    type: 'subscription',
   });
 }
 
 export function Subscriptions() {
   return SetParameter({
-    type: "subscriptions"
+    type: 'subscriptions',
   });
 }
 
 export function Unsubscription() {
   return SetParameter({
-    type: "unsubscription"
+    type: 'unsubscription',
   });
 }
 
 export function Function() {
   return SetParameter({
-    type: "function"
+    type: 'function',
   });
 }
 
 export function Credential() {
   return SetParameter({
-    type: "credential"
+    type: 'credential',
   });
 }
 
 export function Host() {
   return SetParameter({
-    type: "host"
+    type: 'host',
   });
 }
 
 export function Error() {
   return SetParameter({
-    type: "error"
+    type: 'error',
   });
 }

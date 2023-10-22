@@ -1,12 +1,21 @@
-import { PigeonModuleAsyncOptions, PigeonModuleOptions, PigeonOptionsFactory } from "pigeon.interface";
+import {
+  PigeonModuleAsyncOptions,
+  PigeonModuleOptions,
+  PigeonOptionsFactory,
+} from 'pigeon.interface';
 import { Logger, Provider } from '@nestjs/common';
-import { INSTANCE_BROKER, LOGGER_KEY, PIGEON_LOGGER_PROVIDER, PIGEON_OPTION_PROVIDER } from "pigeon.constant";
+import {
+  INSTANCE_BROKER,
+  LOGGER_KEY,
+  PIGEON_LOGGER_PROVIDER,
+  PIGEON_OPTION_PROVIDER,
+} from 'pigeon.constant';
 
 // Function that creates a NestJS provider for Pigeon MQTT options
 export function createOptionsProvider(
   options: PigeonModuleAsyncOptions,
 ): Provider {
-  Logger.log("Creating Option Provider", LOGGER_KEY)
+  Logger.log('Creating Option Provider', LOGGER_KEY);
   // If options include a factory function, create a provider with that factory
   if (options.useFactory) {
     return {
@@ -30,7 +39,7 @@ export function createOptionsProvider(
 export function createOptionProviders(
   options: PigeonModuleAsyncOptions,
 ): Provider[] {
-  Logger.log("Creating Option Provider", LOGGER_KEY)
+  Logger.log('Creating Option Provider', LOGGER_KEY);
   // If options include an existing or factory provider, create a provider array with that provider
   if (options.useExisting || options.useFactory) {
     return [createOptionsProvider(options)];
@@ -52,8 +61,10 @@ export function createOptionProviders(
 }
 
 // Function that creates a NestJS provider for the Logger class
-export function createLoggerProvider(options: PigeonModuleOptions | PigeonModuleAsyncOptions): Provider {
-  Logger.log("Creating Logger Provider", LOGGER_KEY)
+export function createLoggerProvider(
+  options: PigeonModuleOptions | PigeonModuleAsyncOptions,
+): Provider {
+  Logger.log('Creating Logger Provider', LOGGER_KEY);
   // Create a provider for the Logger instance with the name 'MqttModule'
   return {
     provide: PIGEON_LOGGER_PROVIDER,
