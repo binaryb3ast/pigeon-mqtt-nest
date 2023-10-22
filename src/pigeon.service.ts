@@ -9,7 +9,11 @@ export class PigeonService {
     @Inject(INSTANCE_BROKER) private readonly broker: Aedes, // Injects the Aedes broker instance
   ) {}
 
-  // Publishes a message to a topic
+  /**
+   * Publishes a message to a topic using the MQTT broker.
+   * @param packet - The MQTT publish packet containing the message and topic.
+   * @returns A promise that resolves with the published packet if successful, or rejects with an error.
+   */
   publish(packet: PubPacket): Promise<PubPacket> {
     return new Promise<any>((resolve, reject) => {
       this.broker.publish(packet, (error) => {
@@ -21,7 +25,10 @@ export class PigeonService {
     });
   }
 
-  // Closes the broker connection
+  /**
+   * Closes the connection to the MQTT broker.
+   * @returns A promise that resolves with 'success' when the broker connection is closed.
+   */
   close(): Promise<string> {
     return new Promise<any>((resolve) => {
       this.broker.close(() => {
@@ -30,7 +37,10 @@ export class PigeonService {
     });
   }
 
-  // Returns the broker instance
+  /**
+   * Returns the MQTT broker instance used by the Pigeon service.
+   * @returns The Aedes broker instance.
+   */
   getBrokerInstance(): Aedes {
     return this.broker;
   }
