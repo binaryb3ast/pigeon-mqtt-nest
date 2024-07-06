@@ -2,18 +2,18 @@
   "name": "pigeon-mqtt-nest",
   "version": "1.0.18",
   "description": "pigeon-mqtt-nest is an NPM package that simplifies the process of integrating an MQTT broker into Nest JS applications.",
-  "author": "Behnam Nasehi <behnammnasehi@gmail.com>",
+  "author": "",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "readme": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/blob/main/README.md",
-  "repository": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs",
+  "readme": "https://github.com/binaryb3ast/pigeon-mqtt-nestjs/blob/main/README.md",
+  "repository": "https://github.com/binaryb3ast/pigeon-mqtt-nestjs",
   "files": [
     "dist",
     "src"
   ],
   "bugs": {
-    "url": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/issues"
+    "url": "https://github.com/binaryb3ast/pigeon-mqtt-nestjs/issues"
   },
   "keywords": [
     "mqtt",
