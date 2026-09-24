@@ -24,16 +24,22 @@ export function createClientProvider(): Provider {
       }
       const broker = new Aedes(options);
       await broker.listen();
-      if (options.transport === Transport.TCP) {
-        await createServer(broker).listen(options.port);
-        Logger.log(
-          `Creating TCP Server on Port ${options.port}...`,
-          LOGGER_KEY,
-        );
-      }
-      if (options.transport === Transport.WS) {
-        await createServer(broker, { ws: true }).listen(options.port);
-        Logger.log(`Creating WS Server on Port ${options.port}...`, LOGGER_KEY);
+      try {
+        if (options.transport === Transport.TCP) {
+          await createServer(broker).listen(options.port);
+          Logger.log(
+            `Creating TCP Server on Port ${options.port}...`,
+            LOGGER_KEY,
+          );
+        }
+        if (options.transport === Transport.WS) {
+          await createServer(broker, { ws: true }).listen(options.port);
+          Logger.log(`Creating WS Server on Port ${options.port}...`, LOGGER_KEY);
+        }
+      } catch (error) {
+        Logger.error('Failed to create server, closing broker', error, LOGGER_KEY);
+        await broker.close();
+        throw error;
       }
       return broker;
     },

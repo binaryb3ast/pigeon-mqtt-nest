@@ -1,6 +1,6 @@
 import { SystemTopics } from './enum/pigeon.topic.enum';
 
-const SEGMENT_PATTERN_REGEXP = /^((\w+\/)*):?\w+((\/:\w+)+)?$/g;
+const SEGMENT_PATTERN_REGEXP = /^((\w+\/)*):?\w+((\/:\w+)+)?$/;
 
 /**
  * Checks if a value is a regular expression.
@@ -68,13 +68,6 @@ export function isEveryElementString(arr: any): boolean {
 export function isEveryElementRegExp(arr: any): boolean {
   return (
     Array.isArray(arr) &&
-    arr.every((elem) => {
-      try {
-        new RegExp(elem);
-        return true;
-      } catch {
-        return false;
-      }
-    })
+    arr.every((elem) => elem instanceof RegExp)
   );
 }

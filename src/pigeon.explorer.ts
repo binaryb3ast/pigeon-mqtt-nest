@@ -104,7 +104,8 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
    * @param signal - The signal for shutting down.
    */
   async onApplicationShutdown(signal?: string) {
-    Logger.error(`Application Shutdown Signal: ${signal}`, LOGGER_KEY);
+    Logger.log(`Application Shutdown Signal: ${signal}`, LOGGER_KEY);
+    this.broker.removeAllListeners();
     await new Promise<void>((resolve) => this.broker.close(() => resolve()));
   }
 
@@ -261,27 +262,32 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
 
     // Set up an event listener on the "publish" event of a broker object
     // Aedes .d.ts does not declare the 'publish' event overload, so cast is required
-    (
-      this.broker as import('aedes').Aedes & {
-        on(event: 'publish', listener: (packet: PublishPacket, client: Client | null) => void): void;
-      }
-    ).on('publish', (packet: PublishPacket, client: Client | null) => {
-      let subscriber;
-
-      // If the packet's topic matches the "HEART_BEAT" regular expression
-      if (SystemTopics.HEART_BEAT.test(packet.topic)) {
-        // Retrieve the subscribers whose meta matches the "HEART_BEAT" regular expression
-        subscriber = this.getSubscribers(SystemTopics.HEART_BEAT, providers);
-      } else {
-        // Retrieve subscribers whose meta matches the packet's topic and subscribers whose meta matches the "PUBLISH" system topic
-        subscriber = [
-          ...this.getSubscribers(packet.topic, providers),
-          ...this.getSubscribers(SystemTopics.PUBLISH, providers),
-        ];
-      }
-      // Call the `processHandlerListener` method with the retrieved subscribers and the client and packet information
-      this.processHandlerListener(subscriber, { client, packet });
-    });
+    const heartbeatSubscribers = this.getSubscribers(
+      SystemTopics.HEART_BEAT,
+      providers,
+    );
+    const onPublishSubscribers = this.getSubscribers(
+      SystemTopics.PUBLISH,
+      providers,
+    );
+    if (heartbeatSubscribers.length > 0 || onPublishSubscribers.length > 0) {
+      (
+        this.broker as import('aedes').Aedes & {
+          on(event: 'publish', listener: (packet: PublishPacket, client: Client | null) => void): void;
+        }
+      ).on('publish', (packet: PublishPacket, client: Client | null) => {
+        let subscriber;
+        if (heartbeatSubscribers.length > 0 && SystemTopics.HEART_BEAT.test(packet.topic)) {
+          subscriber = heartbeatSubscribers;
+        } else {
+          subscriber = [
+            ...this.getSubscribers(packet.topic, providers),
+            ...onPublishSubscribers,
+          ];
+        }
+        this.processHandlerListener(subscriber, { client, packet });
+      });
+    }
 
     // Set up clientReady listener
     const clientReady = this.getSubscribers(
@@ -515,7 +521,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           return params?.unsubscription;
         case 'payload':
           return getTransform(parameter.transform)(
-            (params?.packet as PublishPacket).payload,
+            (params?.packet as PublishPacket | undefined)?.payload,
           );
         case 'error':
           return params?.error;
