@@ -432,12 +432,15 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   ) {
     for (const subscriber of subscribers) {
       try {
-        // Bind the handler method to the parent class's instance, then call it with the necessary parameters.
-        subscriber.discoveredMethod.handler.bind(
+        const result = subscriber.discoveredMethod.handler.bind(
           subscriber.discoveredMethod.parentClass.instance,
         )(...this.getHandlerMethodParameters(subscriber.params, params));
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          (result as Promise<unknown>).catch((err: unknown) => {
+            this.logger.error(err);
+          });
+        }
       } catch (err) {
-        // Log any errors that occur during the call.
         this.logger.error(err);
       }
     }
