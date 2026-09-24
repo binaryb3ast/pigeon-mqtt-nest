@@ -27,7 +27,8 @@ export class PigeonModule {
    */
   public static forRootAsync(options: PigeonModuleAsyncOptions): DynamicModule {
     return {
-      module: PigeonModule, // Current module
+      module: PigeonModule,
+      imports: [DiscoveryModule],
       providers: [
         ...createOptionProviders(options), // Creates providers for Pigeon options
         createLoggerProvider(options), // Creates a provider for the logger
@@ -45,7 +46,8 @@ export class PigeonModule {
    */
   public static forRoot(options: PigeonModuleOptions): DynamicModule {
     return {
-      module: PigeonModule, // Current module
+      module: PigeonModule,
+      imports: [DiscoveryModule],
       providers: [
         {
           provide: PIGEON_OPTION_PROVIDER, // Provider token for the Pigeon options
