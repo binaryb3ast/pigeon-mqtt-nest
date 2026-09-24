@@ -23,6 +23,7 @@ import {
   LOGGER_KEY,
 } from './pigeon.constant';
 import { Aedes, Client } from 'aedes';
+import type { AuthenticateError } from 'aedes';
 import {
   ConnackPacket,
   ConnectPacket,
@@ -53,15 +54,16 @@ type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
  * Type representing the parameters of handler methods.
  */
 type HandlerMethodParameters = {
-  client?: Client;
+  client?: Client | null;
   packet?: IPacket;
   subscription?: Subscription;
   subscriptions?: Subscription[];
   unsubscription?: string[];
-  callback?: (...args: unknown[]) => unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callback?: (...args: any[]) => any;
   username?: string;
   password?: Readonly<Buffer>;
-  error?;
+  error?: Error;
 };
 
 /**
@@ -130,7 +132,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       this.broker.preConnect = (
         client: Client,
         packet: ConnectPacket,
-        callback,
+        callback: (error: Error | null, success: boolean) => void,
       ) => {
         this.processHandlerListener(preConnect, {
           client,
@@ -160,9 +162,12 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     if (authenticate.length > 0) {
       this.broker.authenticate = (
         client: Client,
-        username: Readonly<string>,
-        password: Readonly<Buffer>,
-        callback,
+        username: Readonly<string | undefined>,
+        password: Readonly<Buffer | undefined>,
+        callback: (
+          error: AuthenticateError | null,
+          success: boolean | null,
+        ) => void,
       ) => {
         this.processHandlerListener(authenticate, {
           client,
@@ -181,9 +186,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     );
     if (authorizePublish.length > 0) {
       this.broker.authorizePublish = (
-        client: Client,
+        client: Client | null,
         packet: PublishPacket,
-        callback,
+        callback: (error?: Error | null) => void,
       ) => {
         this.processHandlerListener(authorizePublish, {
           client,
@@ -203,7 +208,10 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       this.broker.authorizeSubscribe = (
         client: Client,
         subscription: Subscription,
-        callback,
+        callback: (
+          error: Error | null,
+          subscription?: Subscription | null,
+        ) => void,
       ) => {
         this.processHandlerListener(authorizeSubscribe, {
           client,
@@ -241,7 +249,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       this.broker.published = (
         packet: PublishPacket,
         client: Client,
-        callback,
+        callback: (error?: Error | null) => void,
       ) => {
         this.processHandlerListener(published, {
           client,
@@ -252,7 +260,12 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     }
 
     // Set up an event listener on the "publish" event of a broker object
-    this.broker.on('publish', (packet: PublishPacket, client: Client) => {
+    // Aedes .d.ts does not declare the 'publish' event overload, so cast is required
+    (
+      this.broker as import('aedes').Aedes & {
+        on(event: 'publish', listener: (packet: PublishPacket, client: Client | null) => void): void;
+      }
+    ).on('publish', (packet: PublishPacket, client: Client | null) => {
       let subscriber;
 
       // If the packet's topic matches the "HEART_BEAT" regular expression
