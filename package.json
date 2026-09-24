@@ -1,76 +1,85 @@
 {
   "name": "pigeon-mqtt-nest",
-  "version": "1.0.18",
-  "description": "pigeon-mqtt-nest is an NPM package that simplifies the process of integrating an MQTT broker into Nest JS applications.",
-  "author": "Behnam Nasehi <behnammnasehi@gmail.com>",
+  "version": "2.0.0",
+  "description": "A NestJS module for running and integrating an Aedes MQTT broker with topic decorators, lifecycle hooks, authentication, authorization, and message handlers.",
+  "author": {
+    "name": "Binary Beast"
+  },
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "readme": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/blob/main/README.md",
-  "repository": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
-    "src"
+    "README.md",
+    "LICENSE"
   ],
-  "bugs": {
-    "url": "https://github.com/behnamnasehi/pigeon-mqtt-nestjs/issues"
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binaryb3ast/pigeon-mqtt-nest.git"
   },
+  "bugs": {
+    "url": "https://github.com/binaryb3ast/pigeon-mqtt-nest/issues"
+  },
+  "homepage": "https://github.com/binaryb3ast/pigeon-mqtt-nest#readme",
   "keywords": [
     "mqtt",
     "aedes",
-    "nest-mqtt-server",
+    "mqtt-broker",
     "mqtt-server",
     "nestjs",
-    "nest"
+    "nest",
+    "iot"
   ],
-  "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+  "engines": {
+    "node": ">=20.19.0"
   },
-  "dependencies": {
-    "@golevelup/nestjs-discovery": "^4.0.0",
-    "@nestjs/common": "^10.2.7",
-    "@nestjs/core": "^10.2.7",
-    "@nestjs/platform-express": "^10.2.7",
-    "aedes": "^0.50.0",
-    "aedes-server-factory": "^0.2.1",
-    "reflect-metadata": "^0.1.13",
-    "rimraf": "^5.0.5",
+  "scripts": {
+    "clean": "rimraf dist coverage",
+    "build": "npm run clean && nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage --runInBand",
+    "check": "npm run format:check && npm run lint && npm test && npm run build",
+    "prepack": "npm run check"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.1.21",
+    "@nestjs/core": "^11.1.21",
     "rxjs": "^7.8.1"
   },
+  "dependencies": {
+    "@golevelup/nestjs-discovery": "^7.0.3",
+    "aedes": "^1.2.0",
+    "aedes-server-factory": "^0.2.1",
+    "reflect-metadata": "^0.2.2"
+  },
   "devDependencies": {
-    "@nestjs/cli": "^10.1.18",
-    "@nestjs/schematics": "^10.0.2",
-    "@nestjs/testing": "^10.2.6",
-    "@types/express": "^4.17.17",
-    "@types/jest": "29.5.0",
-    "@types/node": "^18.15.3",
-    "@types/supertest": "^2.0.12",
-    "@typescript-eslint/eslint-plugin": "^5.55.0",
-    "@typescript-eslint/parser": "^5.55.0",
-    "eslint": "^8.36.0",
-    "eslint-config-prettier": "^8.7.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "jest": "^29.5.0",
-    "prettier": "^2.8.4",
-    "source-map-support": "^0.5.21",
-    "supertest": "^6.3.3",
-    "ts-jest": "^29.0.5",
-    "ts-loader": "^9.4.2",
-    "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.1.2",
-    "typescript": "^5.0.2"
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/common": "^11.1.21",
+    "@nestjs/core": "^11.1.21",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.1.21",
+
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+
+    "jest": "^30.5.2",
+    "prettier": "^3.6.0",
+    "rimraf": "^6.1.3",
+    "rxjs": "^7.8.1",
+    "ts-jest": "^29.4.13",
+    "typescript": "^6.0.3"
   },
   "jest": {
     "moduleFileExtensions": [
