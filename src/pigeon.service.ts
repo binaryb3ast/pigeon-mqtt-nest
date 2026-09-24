@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { INSTANCE_BROKER } from './pigeon.constant';
 import { PubPacket } from './pigeon.interface';
-import Aedes from 'aedes';
+import { Aedes } from 'aedes';
 
 @Injectable()
 export class PigeonService {
@@ -15,12 +15,20 @@ export class PigeonService {
    * @returns A promise that resolves with the published packet if successful, or rejects with an error.
    */
   publish(packet: PubPacket): Promise<PubPacket> {
-    return new Promise<any>((resolve, reject) => {
-      this.broker.publish(packet, (error) => {
-        if (!error) {
-          return resolve(packet);
+    return new Promise<PubPacket>((resolve, reject) => {
+      // Aedes 1.2.x runtime accepts (packet, client?, done?) but the type
+      // definitions only declare the 2-arg form. Cast to access the full API.
+      (this.broker as unknown as {
+        publish(
+          packet: PubPacket,
+          client: unknown,
+          done: (error?: Error) => void,
+        ): void;
+      }).publish(packet, null, (error?: Error) => {
+        if (error) {
+          return reject(error);
         }
-        return reject(error);
+        return resolve(packet);
       });
     });
   }

@@ -22,8 +22,7 @@ import {
   KEY_SUBSCRIBER_PARAMS,
   LOGGER_KEY,
 } from './pigeon.constant';
-import Aedes from 'aedes';
-import { Client } from 'aedes';
+import { Aedes, Client } from 'aedes';
 import {
   ConnackPacket,
   ConnectPacket,
