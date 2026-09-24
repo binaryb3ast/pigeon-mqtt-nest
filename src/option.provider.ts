@@ -2,14 +2,14 @@ import {
   PigeonModuleAsyncOptions,
   PigeonModuleOptions,
   PigeonOptionsFactory,
-} from 'pigeon.interface';
+} from './pigeon.interface';
 import { Logger, Provider } from '@nestjs/common';
 import {
   INSTANCE_BROKER,
   LOGGER_KEY,
   PIGEON_LOGGER_PROVIDER,
   PIGEON_OPTION_PROVIDER,
-} from 'pigeon.constant';
+} from './pigeon.constant';
 
 /**
  * Function that creates a NestJS provider for Pigeon MQTT options.

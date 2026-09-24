@@ -1,4 +1,4 @@
-import { SystemTopics } from 'enum/pigeon.topic.enum';
+import { SystemTopics } from './enum/pigeon.topic.enum';
 
 const SEGMENT_PATTERN_REGEXP = /^((\w+\/)*):?\w+((\/:\w+)+)?$/g;
 

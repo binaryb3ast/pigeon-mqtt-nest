@@ -1,4 +1,4 @@
-import { MqttMessageTransformer } from 'pigeon.interface';
+import { MqttMessageTransformer } from './pigeon.interface';
 type JSONValue = string | number | boolean | JSONObject | JSONArray;
 type JSONArray = Array<JSONValue>;
 

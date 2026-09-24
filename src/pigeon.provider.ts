@@ -1,14 +1,14 @@
 import { Provider, Logger } from '@nestjs/common';
 import Aedes from 'aedes';
 import { createBroker } from 'aedes';
-import { PigeonModuleOptions } from 'pigeon.interface';
+import { PigeonModuleOptions } from './pigeon.interface';
 import {
   INSTANCE_BROKER,
   LOGGER_KEY,
   PIGEON_OPTION_PROVIDER,
-} from 'pigeon.constant';
+} from './pigeon.constant';
 import { createServer } from 'aedes-server-factory';
-import { Transport } from 'enum/pigeon.transport.enum';
+import { Transport } from './enum/pigeon.transport.enum';
 
 /**
  * Creates a provider function that generates a Pigeon MQTT broker instance based on the provided options.

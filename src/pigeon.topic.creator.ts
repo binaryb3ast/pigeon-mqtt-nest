@@ -1,4 +1,4 @@
-import { EventType } from 'enum/pigeon.eventtype.enum';
+import { EventType } from './enum/pigeon.eventtype.enum';
 import {
   isEveryElementRegExp,
   isEveryElementString,
@@ -7,7 +7,7 @@ import {
   isString,
   isSystemTopic,
   isSystemTopicRegExp,
-} from 'pigeon.validator';
+} from './pigeon.validator';
 
 /**
  * Generates a regular expression from a pattern string, replacing path segments with regex capture groups.

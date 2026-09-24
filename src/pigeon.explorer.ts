@@ -21,7 +21,7 @@ import {
   KEY_SUBSCRIBE_OPTIONS,
   KEY_SUBSCRIBER_PARAMS,
   LOGGER_KEY,
-} from 'pigeon.constant';
+} from './pigeon.constant';
 import Aedes from 'aedes';
 import { Client } from 'aedes';
 import {
@@ -38,10 +38,10 @@ import {
   PigeonModuleOptions,
   PigeonSubscriber,
   MqttSubscriberParameter,
-} from 'pigeon.interface';
+} from './pigeon.interface';
 import { isRegExp } from 'util/types';
-import { getTransform } from 'pigeon.transfrom';
-import { SystemTopics } from 'enum/pigeon.topic.enum';
+import { getTransform } from './pigeon.transfrom';
+import { SystemTopics } from './enum/pigeon.topic.enum';
 
 /**
  * Type representing a method discovered with metadata and parameters.

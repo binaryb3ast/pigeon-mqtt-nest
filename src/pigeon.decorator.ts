@@ -1,11 +1,11 @@
 import { CustomDecorator, SetMetadata } from '@nestjs/common';
-import { KEY_SUBSCRIBE_OPTIONS, KEY_SUBSCRIBER_PARAMS } from 'pigeon.constant';
+import { KEY_SUBSCRIBE_OPTIONS, KEY_SUBSCRIBER_PARAMS } from './pigeon.constant';
 import {
   MqttMessageTransformer,
   MqttSubscribeOptions,
   MqttSubscriberParameter,
-} from 'pigeon.interface';
-import { SystemTopics } from 'enum/pigeon.topic.enum';
+} from './pigeon.interface';
+import { SystemTopics } from './enum/pigeon.topic.enum';
 
 /**
  * Decorator to set metadata for subscribing to a specific MQTT topic.
