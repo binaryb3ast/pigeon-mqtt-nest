@@ -5,7 +5,6 @@ import {
 } from './pigeon.interface';
 import { Logger, Provider } from '@nestjs/common';
 import {
-  INSTANCE_BROKER,
   LOGGER_KEY,
   PIGEON_LOGGER_PROVIDER,
   PIGEON_OPTION_PROVIDER,
@@ -20,7 +19,6 @@ export function createOptionsProvider(
   options: PigeonModuleAsyncOptions,
 ): Provider {
   Logger.log('Creating Option Provider', LOGGER_KEY);
-  // If options include a factory function, create a provider with that factory
   if (options.useFactory) {
     return {
       provide: PIGEON_OPTION_PROVIDER,
@@ -28,44 +26,47 @@ export function createOptionsProvider(
       inject: options.inject || [],
     };
   }
-  // If options include an existing provider, create a provider that uses that provider's factory function
   if (options.useExisting) {
     return {
       provide: PIGEON_OPTION_PROVIDER,
       useFactory: async (optionsFactory: PigeonOptionsFactory) =>
         await optionsFactory.createPigeonConnectOptions(),
-      inject: [options.useExisting || options.useClass],
+      inject: [options.useExisting],
     };
   }
+  if (options.useClass) {
+    return {
+      provide: PIGEON_OPTION_PROVIDER,
+      useFactory: async (optionsFactory: PigeonOptionsFactory) =>
+        await optionsFactory.createPigeonConnectOptions(),
+      inject: [options.useClass],
+    };
+  }
+  throw new Error(
+    'PigeonModule.forRootAsync() requires one of: useFactory, useExisting, or useClass',
+  );
 }
 
 /**
- * Function that creates a collection of NestJS providers for Pigeon MQTT options and the MQTT broker instance.
+ * Function that creates a collection of NestJS providers for Pigeon MQTT options.
  * @param options - The PigeonModuleAsyncOptions containing options for Pigeon MQTT.
- * @returns An array of NestJS providers for Pigeon MQTT options and the MQTT broker instance.
+ * @returns An array of NestJS providers for Pigeon MQTT options.
  */
 export function createOptionProviders(
   options: PigeonModuleAsyncOptions,
 ): Provider[] {
   Logger.log('Creating Option Provider', LOGGER_KEY);
-  // If options include an existing or factory provider, create a provider array with that provider
-  if (options.useExisting || options.useFactory) {
-    return [createOptionsProvider(options)];
+  const optionProvider = createOptionsProvider(options);
+  if (options.useClass) {
+    return [
+      optionProvider,
+      {
+        provide: options.useClass,
+        useClass: options.useClass,
+      },
+    ];
   }
-
-  // Otherwise, create a provider array with the MQTT broker instance provider and the options provider
-  return [
-    {
-      provide: INSTANCE_BROKER,
-      useFactory: async (optionFactory: PigeonOptionsFactory) =>
-        await optionFactory.createPigeonConnectOptions(),
-      inject: [options.useClass],
-    },
-    {
-      provide: options.useClass,
-      useClass: options.useClass,
-    },
-  ];
+  return [optionProvider];
 }
 
 /**

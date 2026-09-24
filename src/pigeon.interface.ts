@@ -137,6 +137,6 @@ export interface PigeonModuleAsyncOptions
   useClass?: Type<PigeonOptionsFactory>; // A class to use for creating options
   useFactory?: (
     ...args: any[]
-  ) => Promise<PigeonOptionsFactory> | PigeonOptionsFactory; // A factory function to use for creating options
+  ) => Promise<PigeonModuleOptions> | PigeonModuleOptions; // A factory function to use for creating options
   logger?: MqttLoggerOptions; // Optional logger configuration for MQTT messages
 }
