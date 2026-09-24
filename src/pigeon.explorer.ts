@@ -496,6 +496,8 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       switch (parameter?.type) {
         case 'client':
           return params?.client;
+        case 'topic':
+          return (params?.packet as PublishPacket | undefined)?.topic ?? null;
         case 'host':
           return this.getHost();
         case 'credential':
