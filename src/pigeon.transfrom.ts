@@ -17,6 +17,9 @@ interface JSONObject {
 export const JsonTransform: MqttMessageTransformer<JSONObject> = (
   payload?: string | Buffer,
 ) => {
+  if (payload == null) {
+    return null as unknown as JSONObject;
+  }
   return JSON.parse(payload.toString('utf-8'));
 };
 
@@ -28,6 +31,9 @@ export const JsonTransform: MqttMessageTransformer<JSONObject> = (
 export const TextTransform: MqttMessageTransformer<string> = (
   payload?: string | Buffer,
 ) => {
+  if (payload == null) {
+    return null as unknown as string;
+  }
   return payload.toString('utf-8');
 };
 
