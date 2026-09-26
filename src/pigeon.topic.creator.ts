@@ -41,8 +41,8 @@ export function getTopicType(topic: any): EventType {
     return isEveryElementString(topic)
       ? EventType.ARR_STRING
       : isEveryElementRegExp(topic)
-      ? EventType.ARR_REGEXP
-      : EventType.UNKNOWN;
+        ? EventType.ARR_REGEXP
+        : EventType.UNKNOWN;
   } else {
     return EventType.UNKNOWN;
   }
@@ -54,7 +54,10 @@ export function getTopicType(topic: any): EventType {
  * @param pattern - The pattern used to extract segments from the URL.
  * @returns An object containing extracted segments and their values.
  */
-export function extractSegments(url: string, pattern: string): Record<string, string> | null {
+export function extractSegments(
+  url: string,
+  pattern: string,
+): Record<string, string> | null {
   const patternRegex = generatePatternRegex(pattern);
   const match = patternRegex.exec(url);
   if (!match) return null;

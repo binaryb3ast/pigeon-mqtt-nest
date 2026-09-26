@@ -103,7 +103,6 @@ type HandlerMethodParameters = {
   subscription?: Subscription;
   subscriptions?: Subscription[];
   unsubscription?: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   callback?: (...args: any[]) => any;
   username?: string;
   password?: Readonly<Buffer>;
@@ -195,8 +194,15 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           callback: guard.wrapped,
         });
         const onMissing = () =>
-          callback(new Error('preConnect handler did not invoke callback'), false);
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          callback(
+            new Error('preConnect handler did not invoke callback'),
+            false,
+          );
+        if (
+          result &&
+          typeof result === 'object' &&
+          typeof (result as Promise<unknown>).then === 'function'
+        ) {
           guard.assertCalledAsync(result as Promise<unknown>, onMissing);
         } else {
           guard.assertCalled(onMissing);
@@ -240,10 +246,16 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         });
         const onMissing = () =>
           callback(
-            new Error('authenticate handler did not invoke callback') as AuthenticateError,
+            new Error(
+              'authenticate handler did not invoke callback',
+            ) as AuthenticateError,
             null,
           );
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+        if (
+          result &&
+          typeof result === 'object' &&
+          typeof (result as Promise<unknown>).then === 'function'
+        ) {
           guard.assertCalledAsync(result as Promise<unknown>, onMissing);
         } else {
           guard.assertCalled(onMissing);
@@ -270,8 +282,14 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           callback: guard.wrapped,
         });
         const onMissing = () =>
-          callback(new Error('authorizePublish handler did not invoke callback'));
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          callback(
+            new Error('authorizePublish handler did not invoke callback'),
+          );
+        if (
+          result &&
+          typeof result === 'object' &&
+          typeof (result as Promise<unknown>).then === 'function'
+        ) {
           guard.assertCalledAsync(result as Promise<unknown>, onMissing);
         } else {
           guard.assertCalled(onMissing);
@@ -305,7 +323,11 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
             new Error('authorizeSubscribe handler did not invoke callback'),
             null,
           );
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+        if (
+          result &&
+          typeof result === 'object' &&
+          typeof (result as Promise<unknown>).then === 'function'
+        ) {
           guard.assertCalledAsync(result as Promise<unknown>, onMissing);
         } else {
           guard.assertCalled(onMissing);
@@ -331,10 +353,14 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         // authorizeForward is synchronous — Aedes expects a direct return value.
         // If the handler returned a Promise (async), we cannot await it here.
         // Log the warning and fall through to default behavior.
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+        if (
+          result &&
+          typeof result === 'object' &&
+          typeof (result as Promise<unknown>).then === 'function'
+        ) {
           this.logger.warn(
             'authorizeForward handler returned a Promise, but Aedes requires a synchronous return. ' +
-            'The authorization decision will be ignored.',
+              'The authorization decision will be ignored.',
           );
           return undefined;
         }
@@ -362,7 +388,11 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         });
         const onMissing = () =>
           callback(new Error('published handler did not invoke callback'));
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+        if (
+          result &&
+          typeof result === 'object' &&
+          typeof (result as Promise<unknown>).then === 'function'
+        ) {
           guard.assertCalledAsync(result as Promise<unknown>, onMissing);
         } else {
           guard.assertCalled(onMissing);
@@ -383,11 +413,17 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     if (heartbeatSubscribers.length > 0 || onPublishSubscribers.length > 0) {
       (
         this.broker as import('aedes').Aedes & {
-          on(event: 'publish', listener: (packet: PublishPacket, client: Client | null) => void): void;
+          on(
+            event: 'publish',
+            listener: (packet: PublishPacket, client: Client | null) => void,
+          ): void;
         }
       ).on('publish', (packet: PublishPacket, client: Client | null) => {
         let subscriber;
-        if (heartbeatSubscribers.length > 0 && SystemTopics.HEART_BEAT.test(packet.topic)) {
+        if (
+          heartbeatSubscribers.length > 0 &&
+          SystemTopics.HEART_BEAT.test(packet.topic)
+        ) {
           subscriber = heartbeatSubscribers;
         } else {
           subscriber = [
@@ -552,7 +588,11 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         lastResult = subscriber.discoveredMethod.handler.bind(
           subscriber.discoveredMethod.parentClass.instance,
         )(...this.getHandlerMethodParameters(subscriber.params, params));
-        if (lastResult && typeof lastResult === 'object' && typeof (lastResult as Promise<unknown>).then === 'function') {
+        if (
+          lastResult &&
+          typeof lastResult === 'object' &&
+          typeof (lastResult as Promise<unknown>).then === 'function'
+        ) {
           (lastResult as Promise<unknown>).catch((err: unknown) => {
             this.logger.error(err);
           });

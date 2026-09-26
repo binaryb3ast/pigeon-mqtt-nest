@@ -21,12 +21,13 @@ export class PigeonService {
       // Aedes 1.2.x runtime accepts (packet, client?, done?) but the type
       // definitions only declare the 2-arg form. Cast to access the full API.
       (this.broker as unknown as {
-        publish(
-          packet: PubPacket,
-          client: unknown,
-          done: (error?: Error) => void,
-        ): void;
-      }).publish(packet, null, (error?: Error) => {
+          publish(
+            packet: PubPacket,
+            client: unknown,
+            done: (error?: Error) => void,
+          ): void;
+        }
+      ).publish(packet, null, (error?: Error) => {
         if (error) {
           return reject(error);
         }

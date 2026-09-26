@@ -1,5 +1,8 @@
 import { CustomDecorator, SetMetadata } from '@nestjs/common';
-import { KEY_SUBSCRIBE_OPTIONS, KEY_SUBSCRIBER_PARAMS } from './pigeon.constant';
+import {
+  KEY_SUBSCRIBE_OPTIONS,
+  KEY_SUBSCRIBER_PARAMS,
+} from './pigeon.constant';
 import {
   MqttMessageTransformer,
   MqttSubscribeOptions,

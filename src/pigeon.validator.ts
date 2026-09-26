@@ -66,8 +66,5 @@ export function isEveryElementString(arr: any): boolean {
  * @returns `true` if every element in the array is a regular expression, `false` otherwise.
  */
 export function isEveryElementRegExp(arr: any): boolean {
-  return (
-    Array.isArray(arr) &&
-    arr.every((elem) => elem instanceof RegExp)
-  );
+  return Array.isArray(arr) && arr.every((elem) => elem instanceof RegExp);
 }

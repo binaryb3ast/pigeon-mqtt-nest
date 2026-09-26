@@ -117,8 +117,7 @@ export interface PigeonModuleOptions extends AedesOptions {
  */
 export interface PigeonOptionsFactory {
   createPigeonConnectOptions():
-    | Promise<PigeonModuleOptions>
-    | PigeonModuleOptions;
+    Promise<PigeonModuleOptions> | PigeonModuleOptions;
 }
 
 /**
@@ -130,8 +129,10 @@ export interface PigeonOptionsFactory {
  * - `useFactory`: A factory function to use for creating options.
  * - `logger`: Optional logger configuration for MQTT messages.
  */
-export interface PigeonModuleAsyncOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface PigeonModuleAsyncOptions extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   inject?: any[]; // Additional dependencies to inject
   useExisting?: Type<PigeonOptionsFactory>; // An existing provider to use for creating options
   useClass?: Type<PigeonOptionsFactory>; // A class to use for creating options

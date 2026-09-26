@@ -19,9 +19,7 @@ import type { Server } from 'node:http';
 export function createClientProviders(): Provider[] {
   // Shared state between the two factory providers.
   // The broker factory runs first (due to token ordering) and populates these.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let brokerRef: Aedes;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let serverRef: any;
 
   const brokerProvider: Provider = {
@@ -45,11 +43,20 @@ export function createClientProviders(): Provider[] {
           );
         }
         if (brokerOptions.transport === Transport.WS) {
-          serverRef = await createServer(broker, { ws: true }).listen(brokerOptions.port);
-          Logger.log(`Creating WS Server on Port ${brokerOptions.port}...`, LOGGER_KEY);
+          serverRef = await createServer(broker, { ws: true }).listen(
+            brokerOptions.port,
+          );
+          Logger.log(
+            `Creating WS Server on Port ${brokerOptions.port}...`,
+            LOGGER_KEY,
+          );
         }
       } catch (error) {
-        Logger.error('Failed to create server, closing broker', error, LOGGER_KEY);
+        Logger.error(
+          'Failed to create server, closing broker',
+          error,
+          LOGGER_KEY,
+        );
         await broker.close();
         throw error;
       }
