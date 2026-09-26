@@ -107,7 +107,7 @@ export interface MqttLoggerOptions {
  */
 export interface PigeonModuleOptions extends AedesOptions {
   port: number; // The port to listen on for MQTT connections
-  transport: Transport; // The port to listen on for MQTT over WebSockets connections
+  transport?: Transport; // The transport type (TCP or WS). Defaults to TCP if not specified.
 }
 
 /**
