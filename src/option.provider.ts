@@ -31,7 +31,7 @@ export function createOptionsProvider(
       provide: PIGEON_OPTION_PROVIDER,
       useFactory: async (optionsFactory: PigeonOptionsFactory) =>
         await optionsFactory.createPigeonConnectOptions(),
-      inject: [options.useExisting],
+      inject: [options.useExisting, ...(options.inject || [])],
     };
   }
   if (options.useClass) {
@@ -39,7 +39,7 @@ export function createOptionsProvider(
       provide: PIGEON_OPTION_PROVIDER,
       useFactory: async (optionsFactory: PigeonOptionsFactory) =>
         await optionsFactory.createPigeonConnectOptions(),
-      inject: [options.useClass],
+      inject: [options.useClass, ...(options.inject || [])],
     };
   }
   throw new Error(
