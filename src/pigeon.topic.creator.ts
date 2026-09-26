@@ -54,10 +54,12 @@ export function getTopicType(topic: any): EventType {
  * @param pattern - The pattern used to extract segments from the URL.
  * @returns An object containing extracted segments and their values.
  */
-export function extractSegments(url: string, pattern: string): object {
+export function extractSegments(url: string, pattern: string): Record<string, string> | null {
   const patternRegex = generatePatternRegex(pattern);
   const match = patternRegex.exec(url);
   if (!match) return null;
-  const keys = pattern.match(/:[^/]+/g).map((key) => key.slice(1));
+  const segments = pattern.match(/:[^/]+/g);
+  if (!segments) return null;
+  const keys = segments.map((key) => key.slice(1));
   return keys.reduce((obj, key, i) => ({ ...obj, [key]: match[i + 1] }), {});
 }
