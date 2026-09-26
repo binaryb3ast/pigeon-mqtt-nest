@@ -20,7 +20,8 @@ export class PigeonService {
     return new Promise<PubPacket>((resolve, reject) => {
       // Aedes 1.2.x runtime accepts (packet, client?, done?) but the type
       // definitions only declare the 2-arg form. Cast to access the full API.
-      (this.broker as unknown as {
+      (
+        this.broker as unknown as {
           publish(
             packet: PubPacket,
             client: unknown,

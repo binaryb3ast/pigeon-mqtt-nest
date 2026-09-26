@@ -178,11 +178,9 @@ export function onConnectionError(): CustomDecorator {
  * @constructor
  */
 function SetParameter(parameter: Partial<MqttSubscriberParameter>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (target: any, propertyKey: string | symbol, paramIndex: number) => {
     const method = target[propertyKey];
-    const params =
-      Reflect.getMetadata(KEY_SUBSCRIBER_PARAMS, method) || [];
+    const params = Reflect.getMetadata(KEY_SUBSCRIBER_PARAMS, method) || [];
     params.push({
       index: paramIndex,
       ...parameter,

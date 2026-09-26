@@ -115,6 +115,11 @@ type HandlerMethodParameters = {
 @Injectable()
 export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   private readonly reflector = new Reflector();
+  /** Cache of bound handler functions, keyed by subscriber object identity. */
+  private readonly boundHandlerCache = new WeakMap<
+    DiscoveredMethodWithMetaAndParameters<string>,
+    (...args: unknown[]) => unknown
+  >();
 
   /**
    * Initializes the PigeonExplorer class with necessary modules and services.
@@ -410,6 +415,26 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
       SystemTopics.PUBLISH,
       providers,
     );
+    // Pre-compute a topic → handlers map for O(1) subscriber resolution on the publish hot path.
+    // String topics are indexed by exact match; RegExp topics are tested per-message.
+    const topicHandlerMap = new Map<
+      string,
+      Array<DiscoveredMethodWithMetaAndParameters<string>>
+    >();
+    const regexpHandlers: Array<DiscoveredMethodWithMetaAndParameters<string>> =
+      [];
+    for (const provider of providers) {
+      if (typeof provider.meta === 'string') {
+        const existing = topicHandlerMap.get(provider.meta);
+        if (existing) {
+          existing.push(provider);
+        } else {
+          topicHandlerMap.set(provider.meta, [provider]);
+        }
+      } else if (isRegExp(provider.meta)) {
+        regexpHandlers.push(provider);
+      }
+    }
     if (heartbeatSubscribers.length > 0 || onPublishSubscribers.length > 0) {
       (
         this.broker as import('aedes').Aedes & {
@@ -426,10 +451,14 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         ) {
           subscriber = heartbeatSubscribers;
         } else {
-          subscriber = [
-            ...this.getSubscribers(packet.topic, providers),
-            ...onPublishSubscribers,
-          ];
+          // O(1) exact string match + O(R) regex scan (R ≪ P total providers)
+          subscriber = topicHandlerMap.get(packet.topic) ?? [];
+          for (const handler of regexpHandlers) {
+            if ((handler.meta as unknown as RegExp).test(String(packet.topic))) {
+              subscriber = [...subscriber, handler];
+            }
+          }
+          subscriber = [...subscriber, ...onPublishSubscribers];
         }
         this.processHandlerListener(subscriber, { client, packet });
       });
@@ -585,9 +614,18 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     let lastResult: unknown;
     for (const subscriber of subscribers) {
       try {
-        lastResult = subscriber.discoveredMethod.handler.bind(
-          subscriber.discoveredMethod.parentClass.instance,
-        )(...this.getHandlerMethodParameters(subscriber.params, params));
+        // Cache the bound method once per subscriber — the DI-resolved instance is stable
+        // across the application lifetime, so this avoids a .bind() allocation per message.
+        let bound = this.boundHandlerCache.get(subscriber);
+        if (!bound) {
+          bound = subscriber.discoveredMethod.handler.bind(
+            subscriber.discoveredMethod.parentClass.instance,
+          );
+          this.boundHandlerCache.set(subscriber, bound);
+        }
+        lastResult = bound(
+          ...this.getHandlerMethodParameters(subscriber.params, params),
+        );
         if (
           lastResult &&
           typeof lastResult === 'object' &&
@@ -650,39 +688,55 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     parameters: MqttSubscriberParameter[],
     params?: HandlerMethodParameters,
   ) {
-    return parameters.map((parameter) => {
+    const len = parameters.length;
+    const result = new Array(len);
+    for (let i = 0; i < len; i++) {
+      const parameter = parameters[i];
       switch (parameter?.type) {
         case 'client':
-          return params?.client;
+          result[i] = params?.client;
+          break;
         case 'topic':
-          return (params?.packet as PublishPacket | undefined)?.topic ?? null;
+          result[i] = (params?.packet as PublishPacket | undefined)?.topic ?? null;
+          break;
         case 'host':
-          return this.getHost();
+          result[i] = this.getHost();
+          break;
         case 'credential':
-          return {
+          result[i] = {
             username: params?.username,
             password: params?.password,
           };
+          break;
         case 'function':
-          return params?.callback;
+          result[i] = params?.callback;
+          break;
         case 'subscription':
-          return params?.subscription;
+          result[i] = params?.subscription;
+          break;
         case 'subscriptions':
-          return params?.subscriptions;
+          result[i] = params?.subscriptions;
+          break;
         case 'unsubscription':
-          return params?.unsubscription;
+          result[i] = params?.unsubscription;
+          break;
         case 'payload':
-          return getTransform(parameter.transform)(
+          result[i] = getTransform(parameter.transform)(
             (params?.packet as PublishPacket | undefined)?.payload ?? null,
           );
+          break;
         case 'error':
-          return params?.error;
+          result[i] = params?.error;
+          break;
         case 'packet':
-          return params?.packet;
+          result[i] = params?.packet;
+          break;
         default:
-          return null;
+          result[i] = null;
+          break;
       }
-    });
+    }
+    return result;
   }
 
   /**
