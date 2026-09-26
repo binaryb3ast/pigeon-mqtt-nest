@@ -5,6 +5,8 @@ import { Aedes } from 'aedes';
 
 @Injectable()
 export class PigeonService {
+  private closed = false;
+
   constructor(
     @Inject(INSTANCE_BROKER) private readonly broker: Aedes, // Injects the Aedes broker instance
   ) {}
@@ -38,7 +40,11 @@ export class PigeonService {
    * @returns A promise that resolves with 'success' when the broker connection is closed.
    */
   close(): Promise<string> {
-    return new Promise<any>((resolve) => {
+    if (this.closed) {
+      return Promise.resolve('success');
+    }
+    this.closed = true;
+    return new Promise<string>((resolve) => {
       this.broker.close(() => {
         resolve('success');
       });
