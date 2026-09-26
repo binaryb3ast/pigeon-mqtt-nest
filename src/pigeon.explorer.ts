@@ -134,7 +134,8 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     private readonly options: PigeonModuleOptions,
     @Inject(PIGEON_LOGGER_PROVIDER) private readonly logger: Logger,
     @Inject(INSTANCE_BROKER) private readonly broker: Aedes,
-    @Inject(INSTANCE_SERVER) private readonly server: import('node:http').Server | null,
+    @Inject(INSTANCE_SERVER)
+    private readonly server: import('node:http').Server | null,
   ) {}
 
   /**
@@ -454,7 +455,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           // O(1) exact string match + O(R) regex scan (R ≪ P total providers)
           subscriber = topicHandlerMap.get(packet.topic) ?? [];
           for (const handler of regexpHandlers) {
-            if ((handler.meta as unknown as RegExp).test(String(packet.topic))) {
+            if (
+              (handler.meta as unknown as RegExp).test(String(packet.topic))
+            ) {
               subscriber = [...subscriber, handler];
             }
           }
@@ -697,7 +700,8 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           result[i] = params?.client;
           break;
         case 'topic':
-          result[i] = (params?.packet as PublishPacket | undefined)?.topic ?? null;
+          result[i] =
+            (params?.packet as PublishPacket | undefined)?.topic ?? null;
           break;
         case 'host':
           result[i] = this.getHost();
