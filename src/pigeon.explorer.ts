@@ -37,7 +37,6 @@ import { IPacket } from 'mqtt-packet';
 
 import {
   PigeonModuleOptions,
-  PigeonSubscriber,
   MqttSubscriberParameter,
 } from './pigeon.interface';
 import { isRegExp } from 'util/types';
@@ -117,7 +116,6 @@ type HandlerMethodParameters = {
 @Injectable()
 export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   private readonly reflector = new Reflector();
-  subscribers: PigeonSubscriber[];
 
   /**
    * Initializes the PigeonExplorer class with necessary modules and services.
@@ -133,9 +131,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     @Inject(PIGEON_LOGGER_PROVIDER) private readonly logger: Logger,
     @Inject(INSTANCE_BROKER) private readonly broker: Aedes,
     @Inject(INSTANCE_SERVER) private readonly server: import('node:http').Server | null,
-  ) {
-    this.subscribers = [];
-  }
+  ) {}
 
   /**
    * Executes onModuleInit when the module is initialized.
