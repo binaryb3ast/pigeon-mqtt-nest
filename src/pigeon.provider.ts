@@ -31,9 +31,12 @@ export function createClientProviders(): Provider[] {
         Logger.log('Setting Default Transport For Mqtt < TCP >', LOGGER_KEY);
         brokerOptions.transport = Transport.TCP;
       }
-      // MQTT-004: Cap queue limit to prevent unbounded memory growth.
-      // Aedes' default in-memory persistence has no eviction; without a cap,
-      // slow consumers accumulate infinite queued messages.
+      // MQTT-004/011: Set defensive defaults to prevent unbounded memory growth.
+      // Aedes' in-memory persistence has no eviction; these caps prevent
+      // slow consumers from exhausting broker memory.
+      if (brokerOptions.maxInflightInbound === undefined) {
+        brokerOptions.maxInflightInbound = 100;
+      }
       if (brokerOptions.queueLimit === undefined) {
         brokerOptions.queueLimit = 1000;
       }
