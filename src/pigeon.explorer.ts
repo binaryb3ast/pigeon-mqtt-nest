@@ -140,9 +140,9 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   /**
    * Executes onModuleInit when the module is initialized.
    */
-  onModuleInit() {
+  async onModuleInit() {
     Logger.log('Pigeon Explorer initialized', LOGGER_KEY);
-    this.init();
+    await this.init();
   }
 
   /**
