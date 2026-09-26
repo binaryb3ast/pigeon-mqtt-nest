@@ -9,8 +9,8 @@
 [![npm version](https://badge.fury.io/js/pigeon-mqtt-nest.svg)](https://badge.fury.io/js/pigeon-mqtt-nest)
 [![npm download](https://img.shields.io/npm/dw/pigeon-mqtt-nest)](https://img.shields.io/npm/dw/pigeon-mqtt-nest)
 [![npm lisence](https://img.shields.io/npm/l/pigeon-mqtt-nest)](https://img.shields.io/npm/l/pigeon-mqtt-nest)
-[![github star](https://img.shields.io/github/stars/behnamnasehi/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/stars/behnamnasehi/pigeon-mqtt-nestjs?style=social)
-[![github fork](https://img.shields.io/github/forks/behnamnasehi/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/forks/behnamnasehi/pigeon-mqtt-nestjs?style=social)
+[![github star](https://img.shields.io/github/stars/binaryb3ast/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/stars/binaryb3ast/pigeon-mqtt-nestjs?style=social)
+[![github fork](https://img.shields.io/github/forks/binaryb3ast/pigeon-mqtt-nestjs?style=social)](https://img.shields.io/github/forks/binaryb3ast/pigeon-mqtt-nestjs?style=social)
 
   <p align="center"> Nest.js MQTT broker that can run on any stream server</p>
 
@@ -65,7 +65,7 @@ $ npm i pigeon-mqtt-nest
 
 # Usage
 
-[Pigeon-Mqtt-Nestjs](https://github.com/behnamnasehi/pigeon-mqtt-nest) will register as a global module. You can
+[Pigeon-Mqtt-Nestjs](https://github.com/binaryb3ast/pigeon-mqtt-nest) will register as a global module. You can
 import with configuration
 
 ```typescript
@@ -1024,7 +1024,7 @@ If `password` or `will.payload` are passed as strings, they will automatically b
 ```text
 MIT License
 
-Copyright (c) 2021 behnamnasehi
+Copyright (c) 2021 binaryb3ast 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
