@@ -28,24 +28,25 @@ export function createClientProviders(): Provider[] {
     provide: INSTANCE_BROKER,
     useFactory: async (options: PigeonModuleOptions) => {
       Logger.log('Creating Broker Instance', LOGGER_KEY);
-      if (!options.transport) {
+      const brokerOptions = { ...options };
+      if (!brokerOptions.transport) {
         Logger.log('Setting Default Transport For Mqtt < TCP >', LOGGER_KEY);
-        options.transport = Transport.TCP;
+        brokerOptions.transport = Transport.TCP;
       }
-      const broker = new Aedes(options);
+      const broker = new Aedes(brokerOptions);
       await broker.listen();
       brokerRef = broker;
       try {
-        if (options.transport === Transport.TCP) {
-          serverRef = await createServer(broker).listen(options.port);
+        if (brokerOptions.transport === Transport.TCP) {
+          serverRef = await createServer(broker).listen(brokerOptions.port);
           Logger.log(
-            `Creating TCP Server on Port ${options.port}...`,
+            `Creating TCP Server on Port ${brokerOptions.port}...`,
             LOGGER_KEY,
           );
         }
-        if (options.transport === Transport.WS) {
-          serverRef = await createServer(broker, { ws: true }).listen(options.port);
-          Logger.log(`Creating WS Server on Port ${options.port}...`, LOGGER_KEY);
+        if (brokerOptions.transport === Transport.WS) {
+          serverRef = await createServer(broker, { ws: true }).listen(brokerOptions.port);
+          Logger.log(`Creating WS Server on Port ${brokerOptions.port}...`, LOGGER_KEY);
         }
       } catch (error) {
         Logger.error('Failed to create server, closing broker', error, LOGGER_KEY);
