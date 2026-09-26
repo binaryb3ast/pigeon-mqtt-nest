@@ -15,7 +15,7 @@ interface JSONObject {
  * @returns Parsed JSON object from the payload.
  */
 export const JsonTransform: MqttMessageTransformer<JSONObject> = (
-  payload?: string | Buffer,
+  payload: string | Buffer | null,
 ) => {
   if (payload == null) {
     return null as unknown as JSONObject;
@@ -29,7 +29,7 @@ export const JsonTransform: MqttMessageTransformer<JSONObject> = (
  * @param payload
  */
 export const TextTransform: MqttMessageTransformer<string> = (
-  payload?: string | Buffer,
+  payload: string | Buffer | null,
 ) => {
   if (payload == null) {
     return null as unknown as string;

@@ -8,7 +8,7 @@ import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { Transport } from './enum/pigeon.transport.enum';
 
 // Define a type for a function that can transform a message payload
-export type MqttMessageTransformer<T> = (payload: string | Buffer) => T;
+export type MqttMessageTransformer<T> = (payload: string | Buffer | null) => T;
 
 /**
  * Interface for specifying options when subscribing to MQTT topics.

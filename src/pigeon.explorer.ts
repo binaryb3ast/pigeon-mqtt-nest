@@ -637,7 +637,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           return params?.unsubscription;
         case 'payload':
           return getTransform(parameter.transform)(
-            (params?.packet as PublishPacket | undefined)?.payload,
+            (params?.packet as PublishPacket | undefined)?.payload ?? null,
           );
         case 'error':
           return params?.error;
