@@ -16,6 +16,7 @@ import {
 } from '@golevelup/nestjs-discovery';
 import {
   INSTANCE_BROKER,
+  INSTANCE_SERVER,
   PIGEON_LOGGER_PROVIDER,
   PIGEON_OPTION_PROVIDER,
   KEY_SUBSCRIBE_OPTIONS,
@@ -131,6 +132,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     private readonly options: PigeonModuleOptions,
     @Inject(PIGEON_LOGGER_PROVIDER) private readonly logger: Logger,
     @Inject(INSTANCE_BROKER) private readonly broker: Aedes,
+    @Inject(INSTANCE_SERVER) private readonly server: import('node:http').Server | null,
   ) {
     this.subscribers = [];
   }
@@ -151,6 +153,17 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
     Logger.log(`Application Shutdown Signal: ${signal}`, LOGGER_KEY);
     this.broker.removeAllListeners();
     await new Promise<void>((resolve) => this.broker.close(() => resolve()));
+    if (this.server) {
+      await new Promise<void>((resolve, reject) => {
+        this.server!.close((err?: Error) => {
+          if (err) {
+            Logger.error('Failed to close server', err, LOGGER_KEY);
+            return reject(err);
+          }
+          resolve();
+        });
+      });
+    }
   }
 
   /**

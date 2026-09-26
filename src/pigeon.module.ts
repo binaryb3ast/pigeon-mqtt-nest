@@ -8,7 +8,7 @@ import {
   PigeonModuleOptions,
 } from './pigeon.interface';
 import { PIGEON_OPTION_PROVIDER } from './pigeon.constant';
-import { createClientProvider } from './pigeon.provider';
+import { createClientProviders } from './pigeon.provider';
 import { PigeonService } from './pigeon.service';
 import { createLoggerProvider, createOptionProviders } from './option.provider';
 import { PigeonExplorer } from './pigeon.explorer';
@@ -32,7 +32,7 @@ export class PigeonModule {
       providers: [
         ...createOptionProviders(options), // Creates providers for Pigeon options
         createLoggerProvider(options), // Creates a provider for the logger
-        createClientProvider(), // Creates a provider for the MQTT client
+        ...createClientProviders(), // Creates providers for the MQTT broker and TCP/WS server
         PigeonExplorer, // Adds the PigeonExplorer service as a provider
         PigeonService, // Adds the PigeonService as a provider
       ],
@@ -54,7 +54,7 @@ export class PigeonModule {
           useValue: options,
         },
         createLoggerProvider(options), // Creates a provider for the logger
-        createClientProvider(), // Creates a provider for the MQTT client
+        ...createClientProviders(), // Creates providers for the MQTT broker and TCP/WS server
         PigeonExplorer, // Adds the PigeonExplorer service as a provider
         PigeonService, // Adds the PigeonService as a provider
       ],

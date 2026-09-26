@@ -3,18 +3,28 @@ import { Aedes } from 'aedes';
 import { PigeonModuleOptions } from './pigeon.interface';
 import {
   INSTANCE_BROKER,
+  INSTANCE_SERVER,
   LOGGER_KEY,
   PIGEON_OPTION_PROVIDER,
 } from './pigeon.constant';
 import { createServer } from 'aedes-server-factory';
 import { Transport } from './enum/pigeon.transport.enum';
+import type { Server } from 'node:http';
 
 /**
- * Creates a provider function that generates a Pigeon MQTT broker instance based on the provided options.
- * @returns A provider configuration object for the Pigeon MQTT broker.
+ * Creates providers for both the Aedes broker and the underlying TCP/WS server.
+ * The server reference is needed for clean shutdown (closing the listening socket).
+ * @returns An array of provider configuration objects.
  */
-export function createClientProvider(): Provider {
-  return {
+export function createClientProviders(): Provider[] {
+  // Shared state between the two factory providers.
+  // The broker factory runs first (due to token ordering) and populates these.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let brokerRef: Aedes;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let serverRef: any;
+
+  const brokerProvider: Provider = {
     provide: INSTANCE_BROKER,
     useFactory: async (options: PigeonModuleOptions) => {
       Logger.log('Creating Broker Instance', LOGGER_KEY);
@@ -24,16 +34,17 @@ export function createClientProvider(): Provider {
       }
       const broker = new Aedes(options);
       await broker.listen();
+      brokerRef = broker;
       try {
         if (options.transport === Transport.TCP) {
-          await createServer(broker).listen(options.port);
+          serverRef = await createServer(broker).listen(options.port);
           Logger.log(
             `Creating TCP Server on Port ${options.port}...`,
             LOGGER_KEY,
           );
         }
         if (options.transport === Transport.WS) {
-          await createServer(broker, { ws: true }).listen(options.port);
+          serverRef = await createServer(broker, { ws: true }).listen(options.port);
           Logger.log(`Creating WS Server on Port ${options.port}...`, LOGGER_KEY);
         }
       } catch (error) {
@@ -45,4 +56,11 @@ export function createClientProvider(): Provider {
     },
     inject: [PIGEON_OPTION_PROVIDER],
   };
+
+  const serverProvider: Provider = {
+    provide: INSTANCE_SERVER,
+    useFactory: () => serverRef as Server,
+  };
+
+  return [brokerProvider, serverProvider];
 }
