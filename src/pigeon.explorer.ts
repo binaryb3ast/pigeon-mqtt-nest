@@ -51,6 +51,50 @@ type DiscoveredMethodWithMetaAndParameters<T> = DiscoveredMethodWithMeta<T> & {
 };
 
 /**
+ * Creates a guarded version of a lifecycle callback that can only be invoked once.
+ * Ensures Aedes lifecycle callbacks are always called, even if the handler
+ * throws, returns a rejected promise, or simply forgets to call the callback.
+ */
+function guardCallback(original: (...args: any[]) => void) {
+  let invoked = false;
+  return {
+    /** The wrapped callback — pass this to the handler instead of the original. */
+    wrapped: (...args: any[]) => {
+      if (!invoked) {
+        invoked = true;
+        return original(...args);
+      }
+    },
+    /**
+     * For synchronous handlers: call after the handler returns.
+     * If the callback was never invoked, calls defaultInvoker.
+     */
+    assertCalled: (defaultInvoker: () => void) => {
+      if (!invoked) {
+        invoked = true;
+        defaultInvoker();
+      }
+    },
+    /**
+     * For async handlers: call with the handler's returned promise.
+     * After the promise settles, if the callback was never invoked,
+     * calls defaultInvoker.
+     */
+    assertCalledAsync: (
+      promise: Promise<unknown>,
+      defaultInvoker: () => void,
+    ) => {
+      promise.finally(() => {
+        if (!invoked) {
+          invoked = true;
+          defaultInvoker();
+        }
+      });
+    },
+  };
+}
+
+/**
  * Type representing the parameters of handler methods.
  */
 type HandlerMethodParameters = {
@@ -135,11 +179,19 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         packet: ConnectPacket,
         callback: (error: Error | null, success: boolean) => void,
       ) => {
-        this.processHandlerListener(preConnect, {
+        const guard = guardCallback(callback);
+        const result = this.processHandlerListener(preConnect, {
           client,
           packet,
-          callback,
+          callback: guard.wrapped,
         });
+        const onMissing = () =>
+          callback(new Error('preConnect handler did not invoke callback'), false);
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          guard.assertCalledAsync(result as Promise<unknown>, onMissing);
+        } else {
+          guard.assertCalled(onMissing);
+        }
       };
     }
 
@@ -170,12 +222,23 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           success: boolean | null,
         ) => void,
       ) => {
-        this.processHandlerListener(authenticate, {
+        const guard = guardCallback(callback);
+        const result = this.processHandlerListener(authenticate, {
           client,
-          callback,
+          callback: guard.wrapped,
           username,
           password,
         });
+        const onMissing = () =>
+          callback(
+            new Error('authenticate handler did not invoke callback') as AuthenticateError,
+            null,
+          );
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          guard.assertCalledAsync(result as Promise<unknown>, onMissing);
+        } else {
+          guard.assertCalled(onMissing);
+        }
       };
     }
 
@@ -191,11 +254,19 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         packet: PublishPacket,
         callback: (error?: Error | null) => void,
       ) => {
-        this.processHandlerListener(authorizePublish, {
+        const guard = guardCallback(callback);
+        const result = this.processHandlerListener(authorizePublish, {
           client,
           packet,
-          callback,
+          callback: guard.wrapped,
         });
+        const onMissing = () =>
+          callback(new Error('authorizePublish handler did not invoke callback'));
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          guard.assertCalledAsync(result as Promise<unknown>, onMissing);
+        } else {
+          guard.assertCalled(onMissing);
+        }
       };
     }
 
@@ -214,11 +285,22 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
           subscription?: Subscription | null,
         ) => void,
       ) => {
-        this.processHandlerListener(authorizeSubscribe, {
+        const guard = guardCallback(callback);
+        const result = this.processHandlerListener(authorizeSubscribe, {
           client,
           subscription: subscription,
-          callback,
+          callback: guard.wrapped,
         });
+        const onMissing = () =>
+          callback(
+            new Error('authorizeSubscribe handler did not invoke callback'),
+            null,
+          );
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          guard.assertCalledAsync(result as Promise<unknown>, onMissing);
+        } else {
+          guard.assertCalled(onMissing);
+        }
       };
     }
 
@@ -233,10 +315,21 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         client: Client,
         packet: PublishPacket,
       ) => {
-        this.processHandlerListener(authorizeForward, {
+        const result = this.processHandlerListener(authorizeForward, {
           client,
           packet,
         });
+        // authorizeForward is synchronous — Aedes expects a direct return value.
+        // If the handler returned a Promise (async), we cannot await it here.
+        // Log the warning and fall through to default behavior.
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          this.logger.warn(
+            'authorizeForward handler returned a Promise, but Aedes requires a synchronous return. ' +
+            'The authorization decision will be ignored.',
+          );
+          return undefined;
+        }
+        return result as import('aedes').AedesPublishPacket | null | undefined;
       };
     }
 
@@ -252,11 +345,19 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         client: Client,
         callback: (error?: Error | null) => void,
       ) => {
-        this.processHandlerListener(published, {
+        const guard = guardCallback(callback);
+        const result = this.processHandlerListener(published, {
           client,
           packet,
-          callback,
+          callback: guard.wrapped,
         });
+        const onMissing = () =>
+          callback(new Error('published handler did not invoke callback'));
+        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
+          guard.assertCalledAsync(result as Promise<unknown>, onMissing);
+        } else {
+          guard.assertCalled(onMissing);
+        }
       };
     }
 
@@ -435,14 +536,15 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
   processHandlerListener(
     subscribers: DiscoveredMethodWithMetaAndParameters<string>[],
     params?: HandlerMethodParameters,
-  ) {
+  ): unknown {
+    let lastResult: unknown;
     for (const subscriber of subscribers) {
       try {
-        const result = subscriber.discoveredMethod.handler.bind(
+        lastResult = subscriber.discoveredMethod.handler.bind(
           subscriber.discoveredMethod.parentClass.instance,
         )(...this.getHandlerMethodParameters(subscriber.params, params));
-        if (result && typeof result === 'object' && typeof (result as Promise<unknown>).then === 'function') {
-          (result as Promise<unknown>).catch((err: unknown) => {
+        if (lastResult && typeof lastResult === 'object' && typeof (lastResult as Promise<unknown>).then === 'function') {
+          (lastResult as Promise<unknown>).catch((err: unknown) => {
             this.logger.error(err);
           });
         }
@@ -450,6 +552,7 @@ export class PigeonExplorer implements OnModuleInit, OnApplicationShutdown {
         this.logger.error(err);
       }
     }
+    return lastResult;
   }
 
   // This function takes in a subscriber, and returns an array of parameters for that subscriber's handler method.
