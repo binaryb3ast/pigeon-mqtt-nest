@@ -9,22 +9,13 @@ import { SystemTopics } from './enum/pigeon.topic.enum';
 
 /**
  * Decorator to set metadata for subscribing to a specific MQTT topic.
+ * @param topic - The topic (string, RegExp, array, or MqttSubscribeOptions) to subscribe to.
  * @constructor
  */
 export function ListenOn(
   topic: string | string[] | RegExp | RegExp[] | MqttSubscribeOptions,
-): CustomDecorator;
-
-/**
- * Implementation of ListenOn decorator.
- * @constructor
- */
-export function ListenOn(topicOrOptions): CustomDecorator {
-  if (typeof topicOrOptions === 'string' || Array.isArray(topicOrOptions)) {
-    return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topicOrOptions);
-  } else {
-    return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topicOrOptions);
-  }
+): CustomDecorator {
+  return SetMetadata(KEY_SUBSCRIBE_OPTIONS, topic);
 }
 
 /**
