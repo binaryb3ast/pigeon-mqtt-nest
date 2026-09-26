@@ -31,6 +31,21 @@ export function createClientProviders(): Provider[] {
         Logger.log('Setting Default Transport For Mqtt < TCP >', LOGGER_KEY);
         brokerOptions.transport = Transport.TCP;
       }
+      // MQTT-004: Cap queue limit to prevent unbounded memory growth.
+      // Aedes' default in-memory persistence has no eviction; without a cap,
+      // slow consumers accumulate infinite queued messages.
+      if (brokerOptions.queueLimit === undefined) {
+        brokerOptions.queueLimit = 1000;
+      }
+      if (!brokerOptions.persistence) {
+        Logger.warn(
+          'Using default in-memory persistence. Retained messages and QoS ' +
+            'tracking state are never evicted and will grow unbounded over ' +
+            'time. For production workloads, set a custom persistence adapter ' +
+            'or use an external broker (EMQX, Mosquitto).',
+          LOGGER_KEY,
+        );
+      }
       const broker = new Aedes(brokerOptions);
       await broker.listen();
       brokerRef = broker;
