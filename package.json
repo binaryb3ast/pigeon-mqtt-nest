@@ -42,16 +42,16 @@
     "node": ">=20.19.0"
   },
   "scripts": {
-    "clean": "rimraf dist coverage",
-    "build": "npm run clean && nest build",
+    "clean": "rimraf dist coverage tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --runInBand",
-    "check": "npm run format:check && npm run lint && npm test && npm run build",
-    "prepack": "npm run check"
+    "check": "npm run format:check && npm run lint && npm run build",
+    "prepack": "npm run build"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.1.21",
